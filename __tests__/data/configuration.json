@@ -1,7 +1,7 @@
 {
-  "neo4j_url": "neo4j://localhost:7687/neo4j",
-  "neo4j_user": "neo4j",
-  "neo4j_pass": "password",
+  "neo4j_url": "",
+  "neo4j_user": "",
+  "neo4j_pass": "",
   "config": {
     "collection_names": ["Movies", "Actors"],
     "object_fields": {
