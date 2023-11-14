@@ -1,0 +1,60 @@
+{
+  "method": "POST",
+  "url": "query",
+  "request": {
+    "collection": "Movies",
+    "arguments": {},
+    "query": {
+      "fields": {
+        "id": {
+          "type": "column",
+          "column": "id"
+        },
+        "title": {
+          "type": "column",
+          "column": "title"
+        },
+        "isPublic": {
+          "type": "column",
+          "column": "isPublic"
+        },
+        "releasedIn": {
+          "type": "column",
+          "column": "releasedIn"
+        },
+        "year": {
+          "type": "column",
+          "column": "year"
+        },
+        "screenTime": {
+          "type": "column",
+          "column": "screenTime"
+        }
+      },
+      "limit": 2
+    },
+    "collection_relationships": {}
+  },
+  "response": [
+    {
+      "rows": [
+        {
+          "id": 1,
+          "title": "The Matrix",
+          "isPublic": true,
+          "releasedIn": "2020-11-09T08:29:56.000Z",
+          "year": "2020-11-09",
+          "screenTime": "P0M0DT7200S"
+        },
+        {
+          "id": 2,
+          "title": "Constantine",
+          "isPublic": false,
+          "releasedIn": "2021-11-12T09:29:56.000Z",
+          "year": "2021-11-12",
+          "screenTime": "P0M0DT9000S"
+        }
+      ]
+    }
+  ]
+}

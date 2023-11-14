@@ -1,0 +1,135 @@
+{
+  "neo4j_url": "neo4j://localhost:7687/neo4j",
+  "neo4j_user": "neo4j",
+  "neo4j_pass": "password",
+  "config": {
+    "collection_names": ["Movies", "Actors"],
+    "object_fields": {
+      "Movie": [
+        "id",
+        "title",
+        "year",
+        "isPublic",
+        "screenTime",
+        "releasedIn",
+        "releasedInLocal",
+        "time",
+        "timeLocal",
+        "size"
+      ],
+      "Actor": ["id", "name", "bornIn", "livesIn"]
+    },
+    "object_types": {
+      "Movie": {
+        "description": null,
+        "fields": {
+          "id": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "Int"
+            }
+          },
+          "title": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "String"
+            }
+          },
+          "isPublic": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "Boolean"
+            }
+          },
+          "screenTime": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "Duration"
+            }
+          },
+          "year": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "Date"
+            }
+          },
+          "releasedIn": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "DateTime"
+            }
+          },
+          "releasedInLocal": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "LocalDateTime"
+            }
+          },
+          "time": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "Time"
+            }
+          },
+          "timeLocal": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "LocalTime"
+            }
+          },
+          "size": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "BigInt"
+            }
+          }
+        }
+      },
+      "Actor": {
+        "description": null,
+        "fields": {
+          "id": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "Int"
+            }
+          },
+          "name": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "String"
+            }
+          },
+          "bornIn": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "Point"
+            }
+          },
+          "livesIn": {
+            "description": null,
+            "type": {
+              "type": "named",
+              "name": "CartesianPoint"
+            }
+          }
+        }
+      }
+    },
+    "functions": [],
+    "procedures": []
+  }
+}

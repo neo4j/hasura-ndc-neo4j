@@ -1,0 +1,131 @@
+{
+  "method": "POST",
+  "url": "query",
+  "request": {
+    "collection": "Movies",
+    "arguments": {},
+    "query": {
+      "fields": {
+        "id": {
+          "type": "column",
+          "column": "id"
+        },
+        "title": {
+          "type": "column",
+          "column": "title"
+        },
+        "isPublic": {
+          "type": "column",
+          "column": "isPublic"
+        },
+        "releasedIn": {
+          "type": "column",
+          "column": "releasedIn"
+        },
+        "year": {
+          "type": "column",
+          "column": "year"
+        },
+        "screenTime": {
+          "type": "column",
+          "column": "screenTime"
+        },
+        "releasedInLocal": {
+          "type": "column",
+          "column": "releasedInLocal"
+        },
+        "time": {
+          "type": "column",
+          "column": "time"
+        },
+        "timeLocal": {
+          "type": "column",
+          "column": "timeLocal"
+        },
+        "size": {
+          "type": "column",
+          "column": "size"
+        }
+      }
+    },
+    "collection_relationships": {}
+  },
+  "response": [
+    {
+      "rows": [
+        {
+          "id": 1,
+          "title": "The Matrix",
+          "isPublic": true,
+          "releasedIn": "2020-11-09T08:29:56.000Z",
+          "year": "2020-11-09",
+          "screenTime": "P0M0DT7200S",
+          "releasedInLocal": "2020-11-09T00:00:00",
+          "size": "9223372036854775807",
+          "time": "11:29:56+03:00",
+          "timeLocal": "11:29:56"
+        },
+        {
+          "id": 2,
+          "title": "Constantine",
+          "isPublic": false,
+          "releasedIn": "2021-11-12T09:29:56.000Z",
+          "releasedInLocal": "2021-11-12T00:00:00",
+          "year": "2021-11-12",
+          "screenTime": "P0M0DT9000S",
+          "size": "9223372036854775807",
+          "time": "12:29:56+03:00",
+          "timeLocal": "12:29:56"
+        },
+        {
+          "id": 3,
+          "title": "Avatar",
+          "isPublic": true,
+          "releasedIn": "2023-11-21T06:30:56.000Z",
+          "releasedInLocal": "2023-11-21T00:00:00",
+          "year": "2023-11-21",
+          "screenTime": "P0M0DT10800S",
+          "size": "9223372036854775807",
+          "time": "09:30:56+03:00",
+          "timeLocal": "09:30:56"
+        },
+        {
+          "id": 4,
+          "title": "The Godfather",
+          "isPublic": true,
+          "releasedIn": "1995-07-11T08:32:56.000Z",
+          "releasedInLocal": "1995-07-11T00:00:00",
+          "year": "1995-07-11",
+          "screenTime": "P0M0DT7200S",
+          "size": "9223372036854775807",
+          "time": "11:32:56+03:00",
+          "timeLocal": "11:32:56"
+        },
+        {
+          "id": 5,
+          "title": "Cats",
+          "isPublic": false,
+          "releasedIn": "2000-08-21T08:59:01.000Z",
+          "releasedInLocal": "2000-08-21T00:00:00",
+          "year": "2000-08-21",
+          "screenTime": "P0M0DT5400S",
+          "size": "9223372036854775807",
+          "time": "11:59:01+03:00",
+          "timeLocal": "11:59:01"
+        },
+        {
+          "id": 6,
+          "title": "Mamma Mia",
+          "isPublic": true,
+          "releasedIn": "2002-01-02T07:02:00.000Z",
+          "releasedInLocal": "2002-01-02T00:00:00",
+          "year": "2002-01-02",
+          "screenTime": "P0M0DT10800S",
+          "size": "9223372036854775807",
+          "time": "10:02:00+03:00",
+          "timeLocal": "10:02:00"
+        }
+      ]
+    }
+  ]
+}

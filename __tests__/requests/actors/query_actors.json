@@ -1,0 +1,131 @@
+{
+  "method": "POST",
+  "url": "query",
+  "request": {
+    "collection": "Actors",
+    "arguments": {},
+    "query": {
+      "fields": {
+        "id": {
+          "type": "column",
+          "column": "id"
+        },
+        "name": {
+          "type": "column",
+          "column": "name"
+        },
+        "bornIn": {
+          "type": "column",
+          "column": "bornIn"
+        },
+        "livesIn": {
+          "type": "column",
+          "column": "livesIn"
+        }
+      }
+    },
+    "collection_relationships": {}
+  },
+  "response": [
+    {
+      "rows": [
+        {
+          "id": 0,
+          "name": "Keanu Reeves",
+          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
+          "livesIn": "point({x: 2.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 1,
+          "name": "Robert De Niro",
+          "bornIn": "point({longitude: 55.7, latitude: 12.78, height: 8})",
+          "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 2,
+          "name": "Carrie-Anne Moss",
+          "bornIn": "point({longitude: 56.7, latitude: 11.78, height: 8})",
+          "livesIn": "point({x: 2.3, y: 2.5, z: 2})"
+        },
+        {
+          "id": 3,
+          "name": "Laurence Fishburne",
+          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
+          "livesIn": "point({x: 2.3, y: 4.5, z: 3})"
+        },
+        {
+          "id": 4,
+          "name": "Rachel Weisz",
+          "bornIn": "point({longitude: 50, latitude: 15, height: 8})",
+          "livesIn": "point({x: 2, y: 4, z: 2})"
+        },
+        {
+          "id": 5,
+          "name": "Vin Diesel",
+          "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
+          "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 6,
+          "name": "Meryl Streep",
+          "bornIn": "point({longitude: 56.7, latitude: 15, height: 9})",
+          "livesIn": "point({x: 2.3, y: 5, z: 2})"
+        },
+        {
+          "id": 7,
+          "name": "Colin Firth",
+          "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
+          "livesIn": "point({x: 2.3, y: 4.5, z: 3})"
+        },
+        {
+          "id": 8,
+          "name": "Julie Walters",
+          "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
+          "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 9,
+          "name": "Dominic Cooper",
+          "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
+          "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 10,
+          "name": "Al Pacino",
+          "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
+          "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 11,
+          "name": "Marlon Brando",
+          "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
+          "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 12,
+          "name": "Diane Keaton",
+          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
+          "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 13,
+          "name": "John Cazale",
+          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
+          "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
+        },
+        {
+          "id": 14,
+          "name": "Zoe Saldana",
+          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
+          "livesIn": "point({x: 2, y: 4, z: 2})"
+        },
+        {
+          "id": 15,
+          "name": "Kate Winslet",
+          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
+          "livesIn": "point({x: 2, y: 4, z: 2})"
+        }
+      ]
+    }
+  ]
+}

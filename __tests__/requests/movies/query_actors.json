@@ -1,0 +1,91 @@
+{
+  "method": "POST",
+  "url": "query",
+  "request": {
+    "collection": "Actors",
+    "arguments": {},
+    "query": {
+      "fields": {
+        "id": {
+          "type": "column",
+          "column": "id"
+        },
+        "name": {
+          "type": "column",
+          "column": "name"
+        }
+      }
+    },
+    "collection_relationships": {}
+  },
+  "response": [
+    {
+      "rows": [
+        {
+          "id": 0,
+          "name": "Keanu Reeves"
+        },
+        {
+          "id": 1,
+          "name": "Robert De Niro"
+        },
+        {
+          "id": 2,
+          "name": "Carrie-Anne Moss"
+        },
+        {
+          "id": 3,
+          "name": "Laurence Fishburne"
+        },
+        {
+          "id": 4,
+          "name": "Rachel Weisz"
+        },
+        {
+          "id": 5,
+          "name": "Vin Diesel"
+        },
+        {
+          "id": 6,
+          "name": "Meryl Streep"
+        },
+        {
+          "id": 7,
+          "name": "Colin Firth"
+        },
+        {
+          "id": 8,
+          "name": "Julie Walters"
+        },
+        {
+          "id": 9,
+          "name": "Dominic Cooper"
+        },
+        {
+          "id": 10,
+          "name": "Al Pacino"
+        },
+        {
+          "id": 11,
+          "name": "Marlon Brando"
+        },
+        {
+          "id": 12,
+          "name": "Diane Keaton"
+        },
+        {
+          "id": 13,
+          "name": "John Cazale"
+        },
+        {
+          "id": 14,
+          "name": "Zoe Saldana"
+        },
+        {
+          "id": 15,
+          "name": "Kate Winslet"
+        }
+      ]
+    }
+  ]
+}

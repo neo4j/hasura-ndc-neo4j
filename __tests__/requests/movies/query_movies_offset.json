@@ -1,0 +1,61 @@
+{
+  "method": "POST",
+  "url": "query",
+  "request": {
+    "collection": "Movies",
+    "arguments": {},
+    "query": {
+      "fields": {
+        "id": {
+          "type": "column",
+          "column": "id"
+        },
+        "title": {
+          "type": "column",
+          "column": "title"
+        },
+        "isPublic": {
+          "type": "column",
+          "column": "isPublic"
+        },
+        "releasedIn": {
+          "type": "column",
+          "column": "releasedIn"
+        },
+        "year": {
+          "type": "column",
+          "column": "year"
+        },
+        "screenTime": {
+          "type": "column",
+          "column": "screenTime"
+        }
+      },
+      "limit": 2,
+      "offset": 3
+    },
+    "collection_relationships": {}
+  },
+  "response": [
+    {
+      "rows": [
+        {
+          "id": 4,
+          "title": "The Godfather",
+          "isPublic": true,
+          "releasedIn": "1995-07-11T08:32:56.000Z",
+          "year": "1995-07-11",
+          "screenTime": "P0M0DT7200S"
+        },
+        {
+          "id": 5,
+          "title": "Cats",
+          "isPublic": false,
+          "releasedIn": "2000-08-21T08:59:01.000Z",
+          "year": "2000-08-21",
+          "screenTime": "P0M0DT5400S"
+        }
+      ]
+    }
+  ]
+}
