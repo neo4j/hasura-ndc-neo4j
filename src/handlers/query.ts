@@ -6,6 +6,7 @@ import {
   BadRequest,
   NotSupported,
   OrderBy,
+  // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { Configuration, ConfigurationSchema, State } from "..";
 import { graphql, GraphQLSchema } from "graphql";
@@ -32,6 +33,7 @@ export async function planQuery(
   query: QueryRequest,
   config: ConfigurationSchema
 ): Promise<QueryPlan> {
+  console.log("query to plan:", JSON.stringify(query, null, 2));
   // Assert that the collection is registered in the schema
   if (!config.collection_names.includes(query.collection)) {
     throw new BadRequest(
@@ -49,13 +51,7 @@ export async function planQuery(
   }
 
   // TODO: support aggregations (tests are commented-out)
-  const {
-    limit,
-    offset,
-    where: predicate,
-    order_by: orderBy,
-    fields,
-  } = query.query;
+  const { limit, offset, predicate, order_by: orderBy, fields } = query.query;
 
   const individualCollectionName: string = query.collection.slice(0, -1);
   if (!fields) {
@@ -74,7 +70,7 @@ export async function planQuery(
   // TODO:
   // the following code throws on behavior that is not supported by the library
   // filter instead of throw to make tests PASS depending on what we want
-  orderBy?.elements.forEach((element) => {
+  orderBy?.elements.forEach((element: any) => {
     if (element.target.type !== "column") {
       throw new BadRequest("Sorting is only supported on own fields!", {
         target: element.target,
@@ -137,7 +133,7 @@ function composeGQLQuery(
 }
 
 function orderByToSort(orderBy: OrderBy | null): string | undefined {
-  const sortEntries = orderBy?.elements.map((element) => {
+  const sortEntries = orderBy?.elements.map((element: any) => {
     const dir = element.order_direction;
     if (element.target.type !== "column") {
       // skip field as it's not supported
@@ -168,8 +164,8 @@ async function performQuery(
   state: State,
   configuration: Configuration
 ): Promise<RowSet[]> {
-  if (state.neoSchema) {
-    return executeQuery(state.neoSchema, queryPlan, state);
+  if (configuration.neoSchema) {
+    return executeQuery(configuration.neoSchema, queryPlan, state);
   }
   const typeDefs = configuration.typedefs;
   if (!typeDefs) {
@@ -228,6 +224,7 @@ export async function doQuery(
   state: State,
   configuration: Configuration
 ): Promise<QueryResponse> {
+  console.log("got query", JSON.stringify(query, null, 2));
   if (!configuration.config) {
     throw new BadRequest("Config is not configured", {});
   }

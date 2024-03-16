@@ -32,3 +32,41 @@ To control the design of the GraphQL operations, the `config` property can be sp
 2. Run `npm run test`
 
 3. Any new tests you want to run should be inside the `__tests__/requests` folder and should follow the schema described in the `__tests__/data/configuration.json` file
+
+## Development
+
+Prerequisite: Steps 1-3 from https://hasura.io/docs/3.0/local-dev/#step-1-prerequisites
+
+1. Start server locally
+
+2. Make sure the connector URL is your local server URL
+
+```yml
+definition:
+  name: neo4j_connector
+  url:
+    singleUrl:
+      value: http://localhost:<PORT>
+```
+
+## Deploy connector
+
+1. Start server locally
+
+2. Use Hasura extension to refresh connector, track collections, track relationships
+
+- only track Array relationships
+- rename relationships if necessary
+
+3. Start Hasura daemon: `hasura3 daemon start`
+
+4. Get Tunnel Endpoint
+
+- check if exists: `hasura3 tunnel list`
+- or create one: `hasura3 tunnel create localhost:<PORT>`
+
+5. Change connector URL to Tunnel Endpoint
+
+6. Deploy connector: `hasura3 build create`
+
+7. Run queries in Hasura Console using the latest build: https://console.hasura.io/project/grown-pegasus-6631
