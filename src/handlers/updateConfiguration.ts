@@ -40,6 +40,8 @@ export async function doUpdateConfiguration(
   configuration.typedefs = typeDefs;
   configuration.neoSchema = neoSchema;
 
+  // TODO: result of toGenericStruct may differ from what toGraphQLTypeDefs used to generate the typedefs string
+  // ideally change the introspector to return typedefs and also the struct it used to generate them
   const genericStruct = await toGenericStruct(() => driver.session());
   console.log("genericStruct", genericStruct);
   const collectionNames = Object.values(genericStruct.nodes)
@@ -112,7 +114,7 @@ function genericStructToHasuraConfig(
     acc[k] = {
       k,
       labels: node.labels,
-      label: node.labels[0], // TODO??
+      label: node.labels[0], // TODO: Assumption - generated query (the collection) will be named using the first label only
       properties: node.properties,
     };
     return acc;
@@ -123,8 +125,6 @@ function genericStructToHasuraConfig(
     console.log("label", nodeLabel);
     const fields = propertiesToHasuraField(node.properties);
     console.log("fields", fields);
-    // objTypes.set(nodeLabel, fields);
-    // objFields.set(nodeLabel, Array.from(fields.keys()));
     config.object_types[nodeLabel] = {
       description: null,
       fields: Object.fromEntries(fields.entries()),
@@ -135,6 +135,7 @@ function genericStructToHasuraConfig(
   const relationships = Object.entries(
     introspectedRelationships
   ).flatMap<RelationshipInfo>(([_, rel]) => {
+    // TODO: Assumption - all relationships are traversable from both directions
     let relationshipsInBothDirection = rel.paths.flatMap<RelationshipInfo>(
       (p) => {
         const fromType = nodesMap[p.fromTypeId];
@@ -198,11 +199,14 @@ function propertiesToHasuraField(
   const fields = new Map<string, ObjectField>();
   for (const property of properties) {
     let fieldType: Type | undefined;
+    // TODO: Assumption - takes only first item
     const propertyType = property.types[0];
+    // TODO: Assumption - all Longs are Ints
     const renamedPropertyType = propertyType.includes("Long")
       ? propertyType.replace("Long", "Int")
       : propertyType;
 
+    // TODO: Assumption - introspector generates properties with types ending in Array for arrays
     if (renamedPropertyType.endsWith("Array")) {
       fieldType = {
         type: "array",

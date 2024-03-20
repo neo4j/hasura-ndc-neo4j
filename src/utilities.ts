@@ -138,7 +138,13 @@ export function lowerFirst(str: string): string {
   return `${str.charAt(0).toLowerCase()}${str.slice(1)}`;
 }
 
-// FROM INTROSPECTOR - generates relationship field name from relationship
+export function asArray<T>(raw: T | Array<T> | undefined | null): Array<T> {
+  if (Array.isArray(raw)) return raw;
+  if (raw === undefined || raw === null) return [];
+  return [raw];
+}
+
+// TODO: export FROM INTROSPECTOR - generates relationship field name from relationship
 export function inferRelationshipFieldName(
   relType: string,
   fromType: string,

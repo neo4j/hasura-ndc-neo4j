@@ -4,14 +4,15 @@ import {
   QueryResponse,
   RowSet,
   BadRequest,
-  NotSupported,
+  Field,
   OrderBy,
+  Query,
   // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { Configuration, ConfigurationSchema, State } from "..";
 import { graphql, GraphQLSchema } from "graphql";
 import { Neo4jGraphQL } from "@neo4j/graphql";
-import { lowerFirst } from "../utilities";
+import { asArray, lowerFirst } from "../utilities";
 
 export type QueryPlan = {
   collectionName: string;
@@ -34,38 +35,95 @@ export async function planQuery(
   config: ConfigurationSchema
 ): Promise<QueryPlan> {
   console.log("query to plan:", JSON.stringify(query, null, 2));
-  // Assert that the collection is registered in the schema
-  if (!config.collection_names.includes(query.collection)) {
-    throw new BadRequest(
-      `Collection ${query.collection} not found in schema!`,
-      { collectionNames: config.collection_names }
-    );
-  }
 
-  // Currently not implemented
-  if (Object.keys(query.collection_relationships).length !== 0) {
-    throw new NotSupported(
-      "Querying with collection relationships not implemented yet!",
-      {}
-    );
+  const simpleQuery = `
+    query { ${makeQuery(
+      query.query,
+      query.collection,
+      lowerFirst(query.collection),
+      config,
+      query
+    )} }
+  `;
+
+  console.log("QUERY IS", simpleQuery);
+
+  return {
+    collectionName: query.collection,
+    simpleQuery,
+  };
+}
+
+function makeQuery(
+  query: Query,
+  collectionName: string,
+  fieldThatQueryIsAttachedTo: string,
+  config: ConfigurationSchema,
+  initialQuery: QueryRequest
+): string {
+  // Assert that the collection is registered in the schema
+  if (!config.collection_names.includes(collectionName)) {
+    throw new BadRequest(`Collection ${collectionName} not found in schema!`, {
+      collectionNames: config.collection_names,
+    });
   }
 
   // TODO: support aggregations (tests are commented-out)
-  const { limit, offset, predicate, order_by: orderBy, fields } = query.query;
+  const { limit, offset, predicate, order_by: orderBy, fields } = query;
 
-  const individualCollectionName: string = query.collection.slice(0, -1);
+  const individualCollectionName: string = collectionName.slice(0, -1);
   if (!fields) {
     throw new BadRequest("Fields must be requested", { query });
   }
-  const requestedFields = Object.keys(fields);
-  requestedFields.forEach((field) => {
-    if (!config.object_fields[individualCollectionName].includes(field)) {
+  Object.keys(fields).forEach((field) => {
+    if (
+      !config.object_fields[individualCollectionName].includes(field) &&
+      !Object.keys(config.foreign_keys[individualCollectionName]).includes(
+        field
+      )
+    ) {
       throw new BadRequest("Requested field not in schema!", {
         field,
         collectionName: individualCollectionName,
       });
     }
   });
+
+  const requestedFields = Object.entries(fields).map<string>(
+    ([fieldName, f]: [string, Field]) => {
+      if (f.type === "column") {
+        return fieldName;
+      }
+      if (f.type === "relationship") {
+        const relationshipMapping = Object.entries(
+          initialQuery.collection_relationships
+        ).find(([k, _]) => {
+          const parsedKey = JSON.parse(k); // eg. [ { subgraph: 'default', name: 'Actor' }, 'actedInMovies' ]
+          if (parsedKey[1] === fieldName) {
+            return true;
+          }
+          return false;
+        });
+        if (!relationshipMapping) {
+          throw BadRequest(
+            "Attempting to resolve relationship field without relationship in collection",
+            { fieldName }
+          );
+        }
+        const targetCollection = (
+          relationshipMapping[1] as { target_collection: string }
+        ).target_collection;
+        return makeQuery(
+          f.query,
+          targetCollection,
+          fieldName,
+          config,
+          initialQuery
+        );
+      }
+      return "";
+    }
+  );
 
   // TODO:
   // the following code throws on behavior that is not supported by the library
@@ -91,21 +149,16 @@ export async function planQuery(
     }
   });
 
-  const simpleQuery = composeGQLQuery(query.collection, requestedFields, {
+  return composeGQLQuery(fieldThatQueryIsAttachedTo, requestedFields, {
     limit,
     offset,
     predicate,
     orderBy,
   });
-
-  return {
-    collectionName: query.collection,
-    simpleQuery,
-  };
 }
 
 function composeGQLQuery(
-  collectionName: string,
+  fieldThatQueryIsAttachedTo: string,
   requestedFields: string[],
   args: {
     limit?: number | null;
@@ -124,10 +177,8 @@ function composeGQLQuery(
       : "";
   //   TODO: make queryArgs fn + transform predicateToWhereFilter fn
   return `
-    query {
-        ${lowerFirst(collectionName)}${queryArgs} {
-            ${requestedFields.join("\n")}
-        }
+    ${fieldThatQueryIsAttachedTo}${queryArgs} {
+      ${requestedFields.join("\n")}
     }
 `;
 }
@@ -163,7 +214,7 @@ async function performQuery(
   queryPlan: QueryPlan,
   state: State,
   configuration: Configuration
-): Promise<RowSet[]> {
+): Promise<Record<string, any> | undefined | null> {
   if (configuration.neoSchema) {
     return executeQuery(configuration.neoSchema, queryPlan, state);
   }
@@ -190,7 +241,7 @@ async function executeQuery(
   neoSchema: GraphQLSchema,
   queryPlan: QueryPlan,
   state: State
-): Promise<RowSet[]> {
+): Promise<Record<string, any> | undefined | null> {
   const result = await graphql({
     schema: neoSchema,
     source: queryPlan.simpleQuery,
@@ -204,10 +255,7 @@ async function executeQuery(
       query: queryPlan.simpleQuery,
     });
   }
-  const resultingRows = {
-    rows: result.data?.[lowerFirst(queryPlan.collectionName)],
-  } as RowSet;
-  return [resultingRows];
+  return result.data;
 }
 
 /**
@@ -228,6 +276,38 @@ export async function doQuery(
   if (!configuration.config) {
     throw new BadRequest("Config is not configured", {});
   }
-  let queryPlan = await planQuery(query, configuration.config);
-  return await performQuery(queryPlan, state, configuration);
+  const queryPlan = await planQuery(query, configuration.config);
+  const neo4jResults = await performQuery(queryPlan, state, configuration);
+  const resultingRows = transformResult(query, neo4jResults || {});
+  return [resultingRows];
+}
+
+function transformResult(
+  query: Query,
+  result: Record<string, any> // {name: "Keanu", actedInMovie: {}},
+): Record<string, any> {
+  const transformed: Record<string, any> = {};
+  if ("collection" in query) {
+    const topLevelQueryResult = result[lowerFirst(query.collection)];
+    return toRows(topLevelQueryResult, query);
+  }
+  for (const fieldName in result) {
+    const fieldDefinition = query.fields[fieldName];
+    if (fieldDefinition.type === "column") {
+      transformed[fieldName] = result[fieldName];
+    }
+    if (fieldDefinition.type === "relationship") {
+      const innerQuery = query.fields[fieldName];
+      transformed[fieldName] = toRows(result[fieldName], innerQuery);
+    }
+  }
+  return transformed;
+}
+
+function toRows(resultAsObjectOrArray: any, engineQuery: Query) {
+  return {
+    rows: asArray(resultAsObjectOrArray).map((result) =>
+      transformResult(engineQuery.query, result)
+    ),
+  };
 }
