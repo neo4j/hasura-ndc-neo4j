@@ -2,11 +2,14 @@ import {
   QueryRequest,
   Expression,
   QueryResponse,
-  RowSet,
+  ComparisonTarget,
   BadRequest,
   Field,
   OrderBy,
   Query,
+  BinaryComparisonOperator,
+  ComparisonValue,
+  PathElement,
   // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { Configuration, ConfigurationSchema, State } from "..";
@@ -69,7 +72,7 @@ function makeQuery(
   }
 
   // TODO: support aggregations (tests are commented-out)
-  const { limit, offset, predicate, order_by: orderBy, fields } = query;
+  const { limit, offset, where: predicate, order_by: orderBy, fields } = query;
 
   const individualCollectionName: string = collectionName.slice(0, -1);
   if (!fields) {
@@ -171,16 +174,161 @@ function composeGQLQuery(
   const offsetStr = args.offset ? `offset: ${args.offset},` : "";
   const sort = args.orderBy && orderByToSort(args.orderBy);
   const sortStr = sort ? `sort: ${sort}` : "";
-  const queryArgs =
+  const optionsArg =
     args.limit || args.offset
-      ? `(options: { ${limitStr} ${offsetStr} ${sortStr} })`
+      ? `options: { ${limitStr} ${offsetStr} ${sortStr} }`
       : "";
+  const whereStr = args.predicate && predicateToWhereFilter(args.predicate);
+  console.log("whereStr", whereStr);
+  const whereArg = `where: { ${whereStr} }`;
+  const queryArgs =
+    whereStr || optionsArg ? `(${[whereArg, optionsArg].join(", ")})` : "";
   //   TODO: make queryArgs fn + transform predicateToWhereFilter fn
+
   return `
     ${fieldThatQueryIsAttachedTo}${queryArgs} {
       ${requestedFields.join("\n")}
     }
 `;
+}
+
+function predicateToWhereFilter(predicateExpression: Expression): string {
+  console.log("predicate", predicateExpression);
+  switch (predicateExpression.type) {
+    case "and":
+    case "or": {
+      const innerPredicates = predicateExpression.expressions.map(
+        predicateToWhereFilter
+      );
+      return `${predicateExpression.type.toUpperCase()}: [${innerPredicates.map(
+        (p: string) => `{${p}}`
+      )}]`;
+    }
+    case "not": {
+      const innerPredicate = predicateToWhereFilter(
+        predicateExpression.expression
+      );
+      return `NOT: {${innerPredicate}}`;
+    }
+    case "unary_comparison_operator": {
+      if (predicateExpression.operator !== "is_null") {
+        throw new Error("unary_comparison_operator not supported yet");
+      }
+      const target = resolveComparisonTarget(predicateExpression.column);
+      if (!target) {
+        // err
+        return "";
+      }
+      const [fieldNamePrefix, suffix] = target;
+      return `${fieldNamePrefix}: null${suffix}`;
+    }
+    case "binary_comparison_operator": {
+      // column: ComparisonTarget;
+      // operator: BinaryComparisonOperator;
+      // value: ComparisonValue;
+
+      const target = resolveComparisonTarget(predicateExpression.column);
+      if (!target) {
+        // err
+        return "";
+      }
+      const [fieldNamePrefix, suffix] = target;
+      const operator = resolveBinaryComparisonOperator(
+        predicateExpression.operator
+      );
+      const value = resolveComparisonValue(predicateExpression.value);
+      return `${fieldNamePrefix}${operator}: ${value}${suffix}`;
+    }
+    case "binary_array_comparison_operator": {
+      // column: ComparisonTarget;
+      // operator: BinaryArrayComparisonOperator;
+      // values: ComparisonValue[];
+      if (predicateExpression.operator !== "in") {
+        throw new Error("binary_array_comparison_operator not supported yet");
+      }
+      const target = resolveComparisonTarget(predicateExpression.column);
+      if (!target) {
+        // err
+        return "";
+      }
+      const values = predicateExpression.values.map(resolveComparisonValue);
+      const [fieldNamePrefix, suffix] = target;
+      return `${fieldNamePrefix}_IN: ${values}${suffix}`;
+    }
+    case "exists":
+      // in_collection: ExistsInCollection;
+      // where: Expression;
+      break;
+  }
+  return "";
+}
+
+// TODO
+function resolveComparisonValue(comparisonValue: ComparisonValue) {
+  switch (comparisonValue.type) {
+    case "column":
+      //   column: ComparisonTarget;
+      return resolveComparisonTarget(comparisonValue.column)?.[0]; // can this have path? (reference a relationship)
+    case "scalar":
+      // value: unknown;
+      console.log("scalar?", typeof comparisonValue.value);
+      if (typeof comparisonValue.value === "string") {
+        return `"${comparisonValue.value}"`;
+      }
+      return comparisonValue.value;
+    case "variable":
+      // name: string;
+      return `$${comparisonValue.name}`; // ????
+  }
+}
+
+function resolveBinaryComparisonOperator(operator: BinaryComparisonOperator) {
+  switch (operator.type) {
+    case "equal":
+      return "";
+    case "other":
+      // name: string;
+      return `_${operator.name.toUpperCase()}`;
+  }
+}
+
+// TODO
+function resolveComparisonTarget(
+  column: ComparisonTarget
+): [string, string] | undefined {
+  switch (column.type) {
+    case "column":
+      /**
+       * The name of the column
+       */
+      // name: string;
+      /**
+       * Any relationships to traverse to reach this column
+       */
+      // path: PathElement[];
+      console.log("path??", column.name, column.path);
+      if (column.path.length) {
+        return blabal([
+          ...column.path.map((p: PathElement) => JSON.parse(p.relationship)[1]),
+          column.name,
+        ]);
+      }
+      return [column.name, ""];
+    case "root_collection_column":
+      // name: string;
+      return [column.name, ""];
+  }
+}
+
+function blabal(layers: string[], suffix: string = ""): [string, string] {
+  console.log("> layers:", layers, suffix);
+  if (layers.length === 1) {
+    return [layers[0], suffix];
+  }
+  const layer = layers.shift();
+  suffix += "}";
+  const [nested, s] = blabal(layers, suffix);
+  return [`${layer}: {${nested}`, s];
 }
 
 function orderByToSort(orderBy: OrderBy | null): string | undefined {
