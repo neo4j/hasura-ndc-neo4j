@@ -199,7 +199,13 @@ const connector: Connector<Configuration, State> = {
     if (!configuration.config) {
       await doUpdateConfiguration(configuration);
     }
-    return doQuery(request, state, configuration);
+    return Promise.all(
+      request.variables
+        ? request.variables.map((v: { [k: string]: unknown }) =>
+            doQuery({ query: request, state, configuration, variables: v })
+          )
+        : [doQuery({ query: request, state, configuration })]
+    );
   },
 
   /**

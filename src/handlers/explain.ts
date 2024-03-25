@@ -19,7 +19,7 @@ export async function doExplain(
     return {
       details: {
         queryRequest: JSON.stringify(query),
-        queryPlan: queryPlan.simpleQuery,
+        queryPlan: queryPlan.neo4jGraphQLQuery,
       },
     };
   } catch (e) {

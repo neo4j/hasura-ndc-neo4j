@@ -6,6 +6,7 @@ import {
   BadRequest,
   Field,
   OrderBy,
+  OrderByElement,
   Query,
   BinaryComparisonOperator,
   ComparisonValue,
@@ -15,11 +16,11 @@ import {
 import { Configuration, ConfigurationSchema, State } from "..";
 import { graphql, GraphQLSchema } from "graphql";
 import { Neo4jGraphQL } from "@neo4j/graphql";
-import { asArray, lowerFirst } from "../utilities";
+import { asArray, lowerFirst, mapToGQLString } from "../utilities";
 
 export type QueryPlan = {
   collectionName: string;
-  simpleQuery: string;
+  neo4jGraphQLQuery: string;
 };
 
 /**
@@ -39,31 +40,40 @@ export async function planQuery(
 ): Promise<QueryPlan> {
   console.log("query to plan:", JSON.stringify(query, null, 2));
 
-  const simpleQuery = `
-    query { ${makeQuery(
-      query.query,
-      query.collection,
-      lowerFirst(query.collection),
-      config,
-      query
-    )} }
+  const neo4jGraphQLQuery = `
+    query { 
+      ${makeGQLQuery({
+        query: query.query,
+        collectionName: query.collection,
+        fieldThatQueryIsAttachedTo: lowerFirst(query.collection),
+        config,
+        initialQuery: query,
+      })} 
+    }
   `;
 
-  console.log("QUERY IS", simpleQuery);
+  console.log("QUERY IS", neo4jGraphQLQuery);
 
   return {
     collectionName: query.collection,
-    simpleQuery,
+    neo4jGraphQLQuery,
   };
 }
 
-function makeQuery(
-  query: Query,
-  collectionName: string,
-  fieldThatQueryIsAttachedTo: string,
-  config: ConfigurationSchema,
-  initialQuery: QueryRequest
-): string {
+// TODO
+function makeGQLQuery({
+  query,
+  collectionName,
+  fieldThatQueryIsAttachedTo,
+  config,
+  initialQuery,
+}: {
+  query: Query;
+  collectionName: string;
+  fieldThatQueryIsAttachedTo: string;
+  config: ConfigurationSchema;
+  initialQuery: QueryRequest;
+}): string {
   // Assert that the collection is registered in the schema
   if (!config.collection_names.includes(collectionName)) {
     throw new BadRequest(`Collection ${collectionName} not found in schema!`, {
@@ -72,7 +82,7 @@ function makeQuery(
   }
 
   // TODO: support aggregations (tests are commented-out)
-  const { limit, offset, where: predicate, order_by: orderBy, fields } = query;
+  const { limit, offset, where, order_by: orderBy, fields } = query;
 
   const individualCollectionName: string = collectionName.slice(0, -1);
   if (!fields) {
@@ -116,13 +126,13 @@ function makeQuery(
         const targetCollection = (
           relationshipMapping[1] as { target_collection: string }
         ).target_collection;
-        return makeQuery(
-          f.query,
-          targetCollection,
-          fieldName,
+        return makeGQLQuery({
+          query: f.query,
+          collectionName: targetCollection,
+          fieldThatQueryIsAttachedTo: fieldName,
           config,
-          initialQuery
-        );
+          initialQuery,
+        });
       }
       return "";
     }
@@ -152,133 +162,110 @@ function makeQuery(
     }
   });
 
-  return composeGQLQuery(fieldThatQueryIsAttachedTo, requestedFields, {
+  return composeQLQueryLevel(fieldThatQueryIsAttachedTo, requestedFields, {
     limit,
     offset,
-    predicate,
+    where,
     orderBy,
   });
 }
 
-function composeGQLQuery(
+function composeQLQueryLevel(
   fieldThatQueryIsAttachedTo: string,
   requestedFields: string[],
   args: {
     limit?: number | null;
     offset?: number | null;
-    predicate?: Expression | null;
+    where?: Expression | null;
     orderBy?: OrderBy | null;
   }
 ): string {
-  const limitStr = args.limit ? `limit: ${args.limit},` : "";
-  const offsetStr = args.offset ? `offset: ${args.offset},` : "";
-  const sort = args.orderBy && orderByToSort(args.orderBy);
-  const sortStr = sort ? `sort: ${sort}` : "";
-  const optionsArg =
-    args.limit || args.offset
-      ? `options: { ${limitStr} ${offsetStr} ${sortStr} }`
-      : "";
-  const whereStr = args.predicate && predicateToWhereFilter(args.predicate);
-  console.log("whereStr", whereStr);
-  const whereArg = `where: { ${whereStr} }`;
-  const queryArgs =
-    whereStr || optionsArg ? `(${[whereArg, optionsArg].join(", ")})` : "";
-  //   TODO: make queryArgs fn + transform predicateToWhereFilter fn
+  const filtersStr =
+    args.where &&
+    `where: ${mapToGQLString(predicateToWhereFilter(args.where))}`;
+
+  const hasSortOption = args.orderBy && args.orderBy.elements.length;
+  const options = {
+    ...(args.limit && { limit: args.limit }),
+    ...(args.offset && { offset: args.offset }),
+    ...(hasSortOption && { sort: orderByToSort(args.orderBy) }),
+  };
+  const optionsStr =
+    Object.entries(options).length && `options: ${mapToGQLString(options)}`;
+
+  const queryArgs = [filtersStr, optionsStr].filter((x) => Boolean(x));
+  const queryArgsStr = queryArgs.length ? `(${queryArgs.join(", ")})` : "";
 
   return `
-    ${fieldThatQueryIsAttachedTo}${queryArgs} {
-      ${requestedFields.join("\n")}
-    }
-`;
+    ${fieldThatQueryIsAttachedTo}${queryArgsStr} {
+        ${requestedFields.join("\n")}
+      }
+  `;
 }
 
-function predicateToWhereFilter(predicateExpression: Expression): string {
-  console.log("predicate", predicateExpression);
+function predicateToWhereFilter(
+  predicateExpression: Expression
+): Record<string, any> {
   switch (predicateExpression.type) {
     case "and":
     case "or": {
       const innerPredicates = predicateExpression.expressions.map(
         predicateToWhereFilter
       );
-      return `${predicateExpression.type.toUpperCase()}: [${innerPredicates.map(
-        (p: string) => `{${p}}`
-      )}]`;
+      return {
+        [predicateExpression.type.toUpperCase()]: innerPredicates,
+      };
     }
     case "not": {
       const innerPredicate = predicateToWhereFilter(
         predicateExpression.expression
       );
-      return `NOT: {${innerPredicate}}`;
+      return { NOT: innerPredicate };
     }
     case "unary_comparison_operator": {
       if (predicateExpression.operator !== "is_null") {
-        throw new Error("unary_comparison_operator not supported yet");
+        throw new Error("Operator is not supported");
       }
-      const target = resolveComparisonTarget(predicateExpression.column);
-      if (!target) {
-        // err
-        return "";
-      }
-      const [fieldNamePrefix, suffix] = target;
-      return `${fieldNamePrefix}: null${suffix}`;
+      const makeFilter = withResolvedTarget(predicateExpression.column);
+      return makeFilter("null", "");
     }
     case "binary_comparison_operator": {
-      // column: ComparisonTarget;
-      // operator: BinaryComparisonOperator;
-      // value: ComparisonValue;
-
-      const target = resolveComparisonTarget(predicateExpression.column);
-      if (!target) {
-        // err
-        return "";
-      }
-      const [fieldNamePrefix, suffix] = target;
+      const makeFilter = withResolvedTarget(predicateExpression.column);
       const operator = resolveBinaryComparisonOperator(
         predicateExpression.operator
       );
       const value = resolveComparisonValue(predicateExpression.value);
-      return `${fieldNamePrefix}${operator}: ${value}${suffix}`;
+      return makeFilter(value, operator);
     }
     case "binary_array_comparison_operator": {
-      // column: ComparisonTarget;
-      // operator: BinaryArrayComparisonOperator;
-      // values: ComparisonValue[];
       if (predicateExpression.operator !== "in") {
-        throw new Error("binary_array_comparison_operator not supported yet");
+        throw new Error("Operator is not supported");
       }
-      const target = resolveComparisonTarget(predicateExpression.column);
-      if (!target) {
-        // err
-        return "";
-      }
+      const makeFilter = withResolvedTarget(predicateExpression.column);
       const values = predicateExpression.values.map(resolveComparisonValue);
-      const [fieldNamePrefix, suffix] = target;
-      return `${fieldNamePrefix}_IN: ${values}${suffix}`;
+      return makeFilter(values, "in");
     }
     case "exists":
       // in_collection: ExistsInCollection;
       // where: Expression;
-      break;
+      // TODO: implement
+      throw Error("Exists operator is not supported");
+    default:
+      throw Error("Operator is not supported");
   }
-  return "";
 }
 
-// TODO
 function resolveComparisonValue(comparisonValue: ComparisonValue) {
   switch (comparisonValue.type) {
     case "column":
-      //   column: ComparisonTarget;
-      return resolveComparisonTarget(comparisonValue.column)?.[0]; // can this have path? (reference a relationship)
+      throw new Error("Comparing against columns is not supported");
     case "scalar":
-      // value: unknown;
-      console.log("scalar?", typeof comparisonValue.value);
       if (typeof comparisonValue.value === "string") {
         return `"${comparisonValue.value}"`;
       }
       return comparisonValue.value;
     case "variable":
-      // name: string;
-      return `$${comparisonValue.name}`; // ????
+      return comparisonValue.name;
   }
 }
 
@@ -287,64 +274,70 @@ function resolveBinaryComparisonOperator(operator: BinaryComparisonOperator) {
     case "equal":
       return "";
     case "other":
-      // name: string;
       return `_${operator.name.toUpperCase()}`;
+    default:
+      throw Error("Operator not supported");
   }
 }
 
 // TODO
-function resolveComparisonTarget(
+function withResolvedTarget(
   column: ComparisonTarget
-): [string, string] | undefined {
+): (value: unknown, operation: string) => Record<string, any> {
   switch (column.type) {
-    case "column":
-      /**
-       * The name of the column
-       */
-      // name: string;
-      /**
-       * Any relationships to traverse to reach this column
-       */
-      // path: PathElement[];
-      console.log("path??", column.name, column.path);
-      if (column.path.length) {
-        return blabal([
-          ...column.path.map((p: PathElement) => JSON.parse(p.relationship)[1]),
-          column.name,
-        ]);
-      }
-      return [column.name, ""];
-    case "root_collection_column":
-      // name: string;
-      return [column.name, ""];
-  }
-}
-
-function blabal(layers: string[], suffix: string = ""): [string, string] {
-  console.log("> layers:", layers, suffix);
-  if (layers.length === 1) {
-    return [layers[0], suffix];
-  }
-  const layer = layers.shift();
-  suffix += "}";
-  const [nested, s] = blabal(layers, suffix);
-  return [`${layer}: {${nested}`, s];
-}
-
-function orderByToSort(orderBy: OrderBy | null): string | undefined {
-  const sortEntries = orderBy?.elements.map((element: any) => {
-    const dir = element.order_direction;
-    if (element.target.type !== "column") {
-      // skip field as it's not supported
-      return "";
+    case "column": {
+      return function createComparison(value: unknown, operator: string) {
+        return resolveTarget(
+          [
+            ...(column.path || []).map(
+              (p: PathElement) => JSON.parse(p.relationship)[1]
+            ),
+            column.name,
+          ],
+          value,
+          operator
+        );
+      };
     }
-    const field = element.target.name;
-    return `{${field}: ${dir.toUpperCase()}}`;
-  });
-  if (!sortEntries?.length) {
-    return;
+    // case "root_collection_column":
+    //   TODO
+    //   return function createComparison(value: unknown, operator: string) {
+    //     return resolveTarget([column.name], value, operator);
+    //   };
+    default:
+      throw new Error("Invalid comparison target");
   }
-  return `[${sortEntries.join(", ")}]`;
+}
+
+function resolveTarget(
+  pathToTarget: string[],
+  value: any,
+  operator: string
+): Record<string, any> {
+  if (pathToTarget.length === 1) {
+    return { [`${pathToTarget[0]}${operator}`]: value };
+  }
+  const [current, ...restOfPath] = pathToTarget;
+  return { [current]: resolveTarget(restOfPath, value, operator) };
+}
+
+function orderByToSort(orderBy: OrderBy): Record<string, string>[] {
+  const sortEntries = orderBy.elements.map((element: OrderByElement) => {
+    switch (element.target.type) {
+      case "column": {
+        if (element.target.path.length) {
+          throw Error("Order by relationships not supported");
+        }
+        const field = element.target.name;
+        return { [field]: element.order_direction.toUpperCase() };
+      }
+      // TODO: Aggregates
+      case "single_column_aggregate":
+      case "star_count_aggregate":
+        throw Error("Order by aggregates not supported");
+    }
+  });
+  return sortEntries;
 }
 
 /**
@@ -358,13 +351,24 @@ function orderByToSort(orderBy: OrderBy | null): string | undefined {
  *                                the rows of data retrieved from the query
  * @throws {Error} If the typeDefinitions have not been constructed or there was any error when executing against the DB.
  */
-async function performQuery(
-  queryPlan: QueryPlan,
-  state: State,
-  configuration: Configuration
-): Promise<Record<string, any> | undefined | null> {
+async function performQuery({
+  queryPlan,
+  state,
+  configuration,
+  variables,
+}: {
+  queryPlan: QueryPlan;
+  state: State;
+  configuration: Configuration;
+  variables?: Record<string, unknown>;
+}): Promise<Record<string, any> | undefined | null> {
   if (configuration.neoSchema) {
-    return executeQuery(configuration.neoSchema, queryPlan, state);
+    return executeQuery({
+      neoSchema: configuration.neoSchema,
+      queryPlan,
+      state,
+      variables,
+    });
   }
   const typeDefs = configuration.typedefs;
   if (!typeDefs) {
@@ -376,31 +380,36 @@ async function performQuery(
       driver: state.neo4j_driver,
     });
     const neoSchema = await neo4jGQL.getSchema();
-    return executeQuery(neoSchema, queryPlan, state);
+    return executeQuery({ neoSchema, queryPlan, state, variables });
   } catch (err) {
     throw new BadRequest("Code errors when executing query", {
       err,
-      query: queryPlan.simpleQuery,
+      query: queryPlan.neo4jGraphQLQuery,
     });
   }
 }
 
-async function executeQuery(
-  neoSchema: GraphQLSchema,
-  queryPlan: QueryPlan,
-  state: State
-): Promise<Record<string, any> | undefined | null> {
+async function executeQuery({
+  neoSchema,
+  queryPlan,
+  state,
+  variables,
+}: {
+  neoSchema: GraphQLSchema;
+  queryPlan: QueryPlan;
+  state: State;
+  variables?: Record<string, unknown>;
+}): Promise<Record<string, any> | undefined | null> {
   const result = await graphql({
     schema: neoSchema,
-    source: queryPlan.simpleQuery,
+    source: queryPlan.neo4jGraphQLQuery,
     contextValue: { executionContext: state.neo4j_driver },
-    // TODO: variables
-    // variableValues: { b1, b2 },
+    variableValues: variables,
   });
   if (result.errors) {
     throw new BadRequest("Errors when executing query ", {
       err: result.errors,
-      query: queryPlan.simpleQuery,
+      query: queryPlan.neo4jGraphQLQuery,
     });
   }
   return result.data;
@@ -415,19 +424,30 @@ async function executeQuery(
  * @param {Configuration} configuration - The configuration object which contains the collection config and the typeDefs for the Neo4jGraphQL Schema in case it is not present in the state.
  * @returns {Promise<QueryResponse>} - A promise resolving to the query response.
  */
-export async function doQuery(
-  query: QueryRequest,
-  state: State,
-  configuration: Configuration
-): Promise<QueryResponse> {
+export async function doQuery({
+  query,
+  state,
+  configuration,
+  variables,
+}: {
+  query: QueryRequest;
+  state: State;
+  configuration: Configuration;
+  variables?: Record<string, unknown>;
+}): Promise<QueryResponse> {
   console.log("got query", JSON.stringify(query, null, 2));
   if (!configuration.config) {
     throw new BadRequest("Config is not configured", {});
   }
   const queryPlan = await planQuery(query, configuration.config);
-  const neo4jResults = await performQuery(queryPlan, state, configuration);
+  const neo4jResults = await performQuery({
+    queryPlan,
+    state,
+    configuration,
+    variables,
+  });
   const resultingRows = transformResult(query, neo4jResults || {});
-  return [resultingRows];
+  return resultingRows;
 }
 
 function transformResult(

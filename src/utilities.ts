@@ -144,6 +144,25 @@ export function asArray<T>(raw: T | Array<T> | undefined | null): Array<T> {
   return [raw];
 }
 
+export function mapToGQLString(
+  x: Record<string, unknown> | Array<unknown> | unknown
+): string {
+  if (typeof x === "object" && !Array.isArray(x) && x !== null) {
+    // x is Object
+    let mapped = "";
+    for (const [k, v] of Object.entries(x)) {
+      mapped += `{ ${k}: ${mapToGQLString(v)} }`;
+    }
+    return mapped;
+  }
+  if (Array.isArray(x)) {
+    // x is Array
+    return `[ ${x.map(mapToGQLString).join(", ")} ]`;
+  }
+  // x is Primitive
+  return `${x}`;
+}
+
 // TODO: export FROM INTROSPECTOR - generates relationship field name from relationship
 export function inferRelationshipFieldName(
   relType: string,
