@@ -1,127 +1,7 @@
-// @ts-ignore
-import { ObjectType, ObjectField, Type } from "@hasura/ndc-sdk-typescript";
-import { Integer } from "neo4j-driver";
 import { Configuration } from ".";
 import neo4j, { Driver } from "neo4j-driver";
-import { RESTRICTED_NAMES } from "./constants";
 import camelcase from "camelcase";
-import pluralize from "pluralize";
-
-const recursiveType = (
-  val: any,
-  namePrefix: string,
-  objTypes: { [k: string]: ObjectType }
-): Type => {
-  const wrapNull = (x: Type): Type => ({
-    type: "nullable",
-    underlying_type: x,
-  });
-
-  if (Array.isArray(val)) {
-    const new_val = val.length === 0 ? "str" : val[0];
-    return wrapNull({
-      type: "array",
-      element_type: recursiveType(new_val, namePrefix, objTypes),
-    });
-  } else if (typeof val === "boolean") {
-    return wrapNull({
-      type: "named",
-      name: "Boolean",
-    });
-  } else if (typeof val === "string") {
-    return wrapNull({
-      type: "named",
-      name: "String",
-    });
-  } else if (typeof val === "number") {
-    if (Number.isInteger(val)) {
-      return wrapNull({
-        type: "named",
-        name: "Int",
-      });
-    } else {
-      return wrapNull({
-        type: "named",
-        name: "Float",
-      });
-    }
-  } else if (typeof val === "object") {
-    // const fDict: any = {};
-    // for (const [k, v] of Object.entries(val)) {
-    //   const nestedName = namePrefix + "_" + k;
-    //   const fieldType = recursiveType(v, nestedName, objTypes);
-    //   fDict[k] = {
-    //     description: null,
-    //     type: fieldType,
-    //   };
-    // }
-    // objTypes[namePrefix] = {
-    //   description: null,
-    //   fields: fDict,
-    // };
-    // return {
-    //   type: "named",
-    //   name: namePrefix,
-    // };
-    if (Integer.isInteger(val)) {
-      return wrapNull({
-        type: "named",
-        name: "Int",
-      });
-    }
-    // TODO: obj is not handled
-    else {
-      throw new Error(`Object Not Handled: ${val}`);
-    }
-  } else {
-    throw new Error(`Not Implemented: ${typeof val}`);
-  }
-};
-
-export const insertion = (
-  collectionName: string,
-  payloadDict: Record<string, any>,
-  objTypes: { [k: string]: ObjectType }
-): Record<string, ObjectField> => {
-  let responseDict: Record<string, ObjectField> = {};
-  for (const [k, v] of Object.entries(payloadDict)) {
-    if (RESTRICTED_NAMES.includes(k)) {
-      throw new Error(`${k} is a restricted name!`);
-    }
-    responseDict[k] = {
-      description: null,
-      type: recursiveType(v, collectionName + "_" + k, objTypes),
-    };
-  }
-  return responseDict;
-};
-
-const getRecursiveTypeGQLFromValue = (val: any): string => {
-  if (Array.isArray(val)) {
-    const new_val = val.length === 0 ? "str" : val[0];
-    return `[${getRecursiveTypeGQLFromValue(new_val)}]`;
-  } else if (typeof val === "boolean") {
-    return `Boolean`;
-  } else if (typeof val === "string") {
-    return `String`;
-  } else if (typeof val === "number") {
-    if (Number.isInteger(val)) {
-      return `Int`;
-    } else {
-      return `Float`;
-    }
-  } else if (typeof val === "object") {
-    if (Integer.isInteger(val)) {
-      return `Int`;
-    }
-    // TODO: obj is not handled
-    else {
-      throw new Error(`Object Not Handled: ${val}`);
-    }
-  } else {
-    throw new Error(`Not Implemented: ${typeof val}, ${val}`);
-  }
-};
+import pluralize, { singular } from "pluralize";
 
 export function getNeo4jDriver(configuration: Configuration): Driver {
   return neo4j.driver(
@@ -130,8 +10,12 @@ export function getNeo4jDriver(configuration: Configuration): Driver {
   );
 }
 
-export function toPlural(name: String) {
-  return `${name}s`;
+export function toPlural(name: string) {
+  return pluralize(name);
+}
+
+export function toSingular(name: string) {
+  return singular(name);
 }
 
 export function lowerFirst(str: string): string {
@@ -142,25 +26,6 @@ export function asArray<T>(raw: T | Array<T> | undefined | null): Array<T> {
   if (Array.isArray(raw)) return raw;
   if (raw === undefined || raw === null) return [];
   return [raw];
-}
-
-export function mapToGQLString(
-  x: Record<string, unknown> | Array<unknown> | unknown
-): string {
-  if (typeof x === "object" && !Array.isArray(x) && x !== null) {
-    // x is Object
-    let mapped = "";
-    for (const [k, v] of Object.entries(x)) {
-      mapped += `{ ${k}: ${mapToGQLString(v)} }`;
-    }
-    return mapped;
-  }
-  if (Array.isArray(x)) {
-    // x is Array
-    return `[ ${x.map(mapToGQLString).join(", ")} ]`;
-  }
-  // x is Primitive
-  return `${x}`;
 }
 
 // TODO: export FROM INTROSPECTOR - generates relationship field name from relationship

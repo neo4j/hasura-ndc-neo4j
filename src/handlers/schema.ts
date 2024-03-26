@@ -14,12 +14,6 @@ export function doGetSchema(config: ConfigurationSchema): SchemaResponse {
         description: null,
         arguments: {},
         type: collectionName,
-        // uniqueness_constraints: {
-        // TODO:
-        // [`${cn.charAt(0).toUpperCase() + cn.slice(1)}ByID`]: {
-        //     unique_columns: ["id"]
-        // }
-        // },
         uniqueness_constraints:
           config.uniqueness_constraints[collectionName] || {},
         foreign_keys: config.foreign_keys[collectionName] || {},

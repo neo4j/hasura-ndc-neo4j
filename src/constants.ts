@@ -8,14 +8,13 @@ import { JSONSchemaObject } from "@json-schema-tools/meta-schema";
 
 export const CAPABILITIES_RESPONSE: CapabilitiesResponse = {
   versions: "^0.1.0",
-  // version: "^0.1.0",
   capabilities: {
     query: {
-      explain: {},
+      aggregates: {},
       variables: {},
     },
-    mutation: {},
-    relationships: { relation_comparisons: {} },
+    explain: {},
+    relationships: { relation_comparisons: {}, order_by_aggregate: {} },
   },
 };
 

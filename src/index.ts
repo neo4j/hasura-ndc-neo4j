@@ -24,9 +24,7 @@ import { doUpdateConfiguration } from "./handlers/updateConfiguration";
 import { JSONSchemaObject } from "@json-schema-tools/meta-schema";
 import { Driver } from "neo4j-driver";
 import { getNeo4jDriver } from "./utilities";
-import { Neo4jGraphQL } from "@neo4j/graphql";
 import { GraphQLSchema } from "graphql";
-import { readFileSync } from "fs";
 
 export interface ConfigurationSchema {
   collection_names: string[];

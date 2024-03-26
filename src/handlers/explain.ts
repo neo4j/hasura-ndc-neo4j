@@ -5,7 +5,7 @@ import {
   // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { Configuration } from "..";
-import { QueryPlan, planQuery } from "./query";
+import { QueryPlan, planQuery } from "../query/plan";
 
 export async function doExplain(
   query: QueryRequest,
