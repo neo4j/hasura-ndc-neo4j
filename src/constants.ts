@@ -1,8 +1,8 @@
 import {
   CapabilitiesResponse,
   ScalarType,
-  ObjectField,
   ObjectType,
+  // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { JSONSchemaObject } from "@json-schema-tools/meta-schema";
 
@@ -10,15 +10,11 @@ export const CAPABILITIES_RESPONSE: CapabilitiesResponse = {
   versions: "^0.1.0",
   capabilities: {
     query: {
-      foreach: {},
-      // relation_comparisons: {},
-      // order_by_aggregate: {},
+      aggregates: {},
+      variables: {},
     },
-    // mutations: {
-    //   nested_inserts: {},
-    //   returning: {}
-    // },
-    // relationships: {}
+    explain: {},
+    relationships: { relation_comparisons: {}, order_by_aggregate: {} },
   },
 };
 
@@ -27,522 +23,659 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Int",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Int",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Int",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Int",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Int",
         },
       },
     },
-    update_operators: {},
   },
   Float: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Float",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Float",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Float",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Float",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Float",
         },
       },
     },
-    update_operators: {},
   },
   Boolean: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Boolean",
         },
       },
     },
-    update_operators: {},
   },
   String: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "String",
         },
       },
       contains: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "String",
         },
       },
       starts_with: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "String",
         },
       },
       ends_with: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "String",
         },
       },
       not_contains: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "String",
         },
       },
       not_starts_with: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "String",
         },
       },
       not_ends_with: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "String",
         },
       },
     },
-    update_operators: {},
   },
   ID: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "ID",
         },
       },
       contains: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "ID",
         },
       },
       starts_with: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "ID",
         },
       },
       ends_with: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "ID",
         },
       },
       not_contains: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "ID",
         },
       },
       not_starts_with: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "ID",
         },
       },
       not_ends_with: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "ID",
         },
       },
     },
-    update_operators: {},
   },
   DateTime: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "DateTime",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "DateTime",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "DateTime",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "DateTime",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "DateTime",
         },
       },
     },
-    update_operators: {},
   },
   Date: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Date",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Date",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Date",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Date",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Date",
         },
       },
     },
-    update_operators: {},
   },
   Duration: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Duration",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Duration",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Duration",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Duration",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Duration",
         },
       },
     },
-    update_operators: {},
   },
   LocalDateTime: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalDateTime",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalDateTime",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalDateTime",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalDateTime",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalDateTime",
         },
       },
     },
-    update_operators: {},
   },
   LocalTime: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalTime",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalTime",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalTime",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalTime",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "LocalTime",
         },
       },
     },
-    update_operators: {},
   },
   Time: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Time",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Time",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Time",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Time",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "Time",
         },
       },
     },
-    update_operators: {},
   },
   BigInt: {
     aggregate_functions: {},
     comparison_operators: {
       not: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "BigInt",
         },
       },
       gt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "BigInt",
         },
       },
       lt: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "BigInt",
         },
       },
       gte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "BigInt",
         },
       },
       lte: {
+        type: "custom",
         argument_type: {
           type: "named",
           name: "BigInt",
         },
       },
     },
-    update_operators: {},
   },
-  CartesianPoint: {
-    aggregate_functions: {},
-    comparison_operators: {
-      not: {
-        argument_type: {
-          type: "named",
-          name: "CartesianPoint",
-        },
-      },
-      distance: {
-        argument_type: {
-          type: "named",
-          name: "CartesianPointDistance",
-        },
-      },
-      gt: {
-        argument_type: {
-          type: "named",
-          name: "CartesianPointDistance",
-        },
-      },
-      lt: {
-        argument_type: {
-          type: "named",
-          name: "CartesianPointDistance",
-        },
-      },
-      gte: {
-        argument_type: {
-          type: "named",
-          name: "CartesianPointDistance",
-        },
-      },
-      lte: {
-        argument_type: {
-          type: "named",
-          name: "CartesianPointDistance",
-        },
-      },
-    },
-    update_operators: {},
-  },
-  Point: {
-    aggregate_functions: {},
-    comparison_operators: {
-      not: {
-        argument_type: {
-          type: "named",
-          name: "Point",
-        },
-      },
-      distance: {
-        argument_type: {
-          type: "named",
-          name: "PointDistance",
-        },
-      },
-      gt: {
-        argument_type: {
-          type: "named",
-          name: "PointDistance",
-        },
-      },
-      lt: {
-        argument_type: {
-          type: "named",
-          name: "PointDistance",
-        },
-      },
-      gte: {
-        argument_type: {
-          type: "named",
-          name: "PointDistance",
-        },
-      },
-      lte: {
-        argument_type: {
-          type: "named",
-          name: "PointDistance",
-        },
-      },
-    },
-    update_operators: {},
-  },
+  // CartesianPoint: {
+  //   aggregate_functions: {},
+  //   comparison_operators: {
+  //     not: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "CartesianPoint",
+  //       },
+  //     },
+  //     distance: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "CartesianPointDistance",
+  //       },
+  //     },
+  //     gt: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "CartesianPointDistance",
+  //       },
+  //     },
+  //     lt: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "CartesianPointDistance",
+  //       },
+  //     },
+  //     gte: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "CartesianPointDistance",
+  //       },
+  //     },
+  //     lte: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "CartesianPointDistance",
+  //       },
+  //     },
+  //   },
+  //   update_operators: {},
+  // },
+  // Point: {
+  //   aggregate_functions: {},
+  //   comparison_operators: {
+  //     not: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "Point",
+  //       },
+  //     },
+  //     distance: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "PointDistance",
+  //       },
+  //     },
+  //     gt: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "PointDistance",
+  //       },
+  //     },
+  //     lt: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "PointDistance",
+  //       },
+  //     },
+  //     gte: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "PointDistance",
+  //       },
+  //     },
+  //     lte: {
+  //       argument_type: {
+  //         type: "named",
+  //         name: "PointDistance",
+  //       },
+  //     },
+  //   },
+  //   update_operators: {},
+  // },
 };
 
 // TODO: maybe add input objects and enums here
-export const BASE_TYPES: { [k: string]: ObjectType } = {};
+export const BASE_TYPES: { [k: string]: ObjectType } = {
+  Point: {
+    description:
+      "A point in a coordinate system. For more information, see https://neo4j.com/docs/graphql/4/type-definitions/types/spatial/#point",
+    fields: {
+      longitude: {
+        description: null,
+        type: {
+          type: "named",
+          name: "Float",
+        },
+      },
+      latitude: {
+        description: null,
+        type: {
+          type: "named",
+          name: "Float",
+        },
+      },
+      height: {
+        description: null,
+        type: {
+          type: "nullable",
+          underlying_type: {
+            type: "named",
+            name: "Float",
+          },
+        },
+      },
+      crs: {
+        description: null,
+        type: {
+          type: "named",
+          name: "String",
+        },
+      },
+      srid: {
+        description: null,
+        type: {
+          type: "named",
+          name: "Int",
+        },
+      },
+    },
+  },
+  CartesianPoint: {
+    description:
+      "A point in a two- or three-dimensional Cartesian coordinate system or in a three-dimensional cylindrical coordinate system. For more information, see https://neo4j.com/docs/graphql/4/type-definitions/types/spatial/#cartesian-point",
+    fields: {
+      x: {
+        description: null,
+        type: {
+          type: "named",
+          name: "Float",
+        },
+      },
+      y: {
+        description: null,
+        type: {
+          type: "named",
+          name: "Float",
+        },
+      },
+      z: {
+        description: null,
+        type: {
+          type: "nullable",
+          underlying_type: {
+            type: "named",
+            name: "Float",
+          },
+        },
+      },
+      crs: {
+        description: null,
+        type: {
+          type: "named",
+          name: "String",
+        },
+      },
+      srid: {
+        description: null,
+        type: {
+          type: "named",
+          name: "Int",
+        },
+      },
+    },
+  },
+};
 
 // field names that are not valid
 export const RESTRICTED_NAMES: string[] = [];

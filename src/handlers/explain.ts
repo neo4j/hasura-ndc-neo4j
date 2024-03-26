@@ -2,9 +2,10 @@ import {
   BadRequest,
   ExplainResponse,
   QueryRequest,
+  // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { Configuration } from "..";
-import { QueryPlan, planQuery } from "./query";
+import { QueryPlan, planQuery } from "../query/plan";
 
 export async function doExplain(
   query: QueryRequest,
@@ -18,7 +19,7 @@ export async function doExplain(
     return {
       details: {
         queryRequest: JSON.stringify(query),
-        queryPlan: queryPlan.simpleQuery,
+        queryPlan: queryPlan.neo4jGraphQLQuery,
       },
     };
   } catch (e) {
