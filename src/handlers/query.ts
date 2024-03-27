@@ -33,7 +33,7 @@ export async function doQuery({
   if (!configuration.config) {
     throw new BadRequest("Config is not configured", {});
   }
-  const queryPlan = await planQuery(query, configuration.config);
+  const queryPlan = await planQuery(query, configuration.config, variables);
   const neo4jResults = await performQuery({
     queryPlan,
     state,
@@ -41,5 +41,9 @@ export async function doQuery({
     variables,
   });
   const resultingRows = transformResult(query, neo4jResults || {});
+  console.log("resulting rows", resultingRows);
   return resultingRows;
+  // return {
+  //   rows: [{ name: "Keanu", __hasura_phantom_field__car: { rows: [] } }],
+  // };
 }

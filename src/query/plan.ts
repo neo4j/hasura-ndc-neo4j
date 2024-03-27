@@ -33,10 +33,10 @@ export type QueryPlan = {
  */
 export async function planQuery(
   query: QueryRequest,
-  config: ConfigurationSchema
+  config: ConfigurationSchema,
+  variables?: Record<string, unknown>
 ): Promise<QueryPlan> {
   console.log("query to plan:", JSON.stringify(query, null, 2));
-
   const neo4jGraphQLQuery = `
       query { 
         ${makeGQLQuery({
@@ -45,6 +45,7 @@ export async function planQuery(
           fieldThatQueryIsAttachedTo: lowerFirst(query.collection),
           config,
           initialQuery: query,
+          variables,
         })} 
       }
     `;
@@ -64,12 +65,14 @@ function makeGQLQuery({
   fieldThatQueryIsAttachedTo,
   config,
   initialQuery,
+  variables,
 }: {
   query: Query;
   collectionName: string;
   fieldThatQueryIsAttachedTo: string;
   config: ConfigurationSchema;
   initialQuery: QueryRequest;
+  variables?: Record<string, unknown>;
 }): string {
   // Assert that the collection is registered in the schema
   if (!config.collection_names.includes(collectionName)) {
@@ -84,22 +87,25 @@ function makeGQLQuery({
   if (!fields) {
     throw new BadRequest("Fields must be requested", { query });
   }
-  Object.keys(fields).forEach((field) => {
-    if (
-      !config.object_fields[individualCollectionName].includes(field) &&
-      !Object.keys(config.foreign_keys[individualCollectionName]).includes(
-        field
-      )
-    ) {
-      throw new BadRequest("Requested field not in schema!", {
-        field,
-        collectionName: individualCollectionName,
-      });
-    }
-  });
+  Object.keys(fields)
+    .filter((fieldName) => !fieldName.includes("hasura_phantom_field"))
+    .forEach((field) => {
+      if (
+        !config.object_fields[individualCollectionName].includes(field) &&
+        !Object.keys(config.foreign_keys[individualCollectionName]).includes(
+          field
+        )
+      ) {
+        throw new BadRequest("Requested field not in schema!", {
+          field,
+          collectionName: individualCollectionName,
+        });
+      }
+    });
 
-  const requestedFields = Object.entries(fields).map<string>(
-    ([fieldName, f]: [string, Field]) => {
+  const requestedFields = Object.entries(fields)
+    .filter(([fieldName, _]) => !fieldName.includes("hasura_phantom_field"))
+    .map<string>(([fieldName, f]: [string, Field]) => {
       if (f.type === "column") {
         return fieldName;
       }
@@ -128,11 +134,11 @@ function makeGQLQuery({
           fieldThatQueryIsAttachedTo: fieldName,
           config,
           initialQuery,
+          variables,
         });
       }
       return "";
-    }
-  );
+    });
 
   // TODO:
   // the following code throws on behavior that is not supported by the library
@@ -158,12 +164,17 @@ function makeGQLQuery({
     }
   });
 
-  return composeGQLQueryForLevel(fieldThatQueryIsAttachedTo, requestedFields, {
-    limit,
-    offset,
-    where,
-    orderBy,
-  });
+  return composeGQLQueryForLevel(
+    fieldThatQueryIsAttachedTo,
+    requestedFields,
+    {
+      limit,
+      offset,
+      where,
+      orderBy,
+    },
+    variables
+  );
 }
 
 function composeGQLQueryForLevel(
@@ -174,11 +185,12 @@ function composeGQLQueryForLevel(
     offset?: number | null;
     where?: Expression | null;
     orderBy?: OrderBy | null;
-  }
+  },
+  variables?: Record<string, unknown>
 ): string {
   const filtersStr =
     args.where &&
-    `where: ${mapToGQLString(predicateToWhereFilter(args.where))}`;
+    `where: ${mapToGQLString(predicateToWhereFilter(args.where, variables))}`;
 
   const hasSortOption = args.orderBy && args.orderBy.elements.length;
   const options = {
@@ -200,13 +212,14 @@ function composeGQLQueryForLevel(
 }
 
 function predicateToWhereFilter(
-  predicateExpression: Expression
+  predicateExpression: Expression,
+  variables?: Record<string, unknown>
 ): Record<string, any> {
   switch (predicateExpression.type) {
     case "and":
     case "or": {
       const innerPredicates = predicateExpression.expressions.map(
-        predicateToWhereFilter
+        (expr: Expression) => predicateToWhereFilter(expr, variables)
       );
       return {
         [predicateExpression.type.toUpperCase()]: innerPredicates,
@@ -214,7 +227,8 @@ function predicateToWhereFilter(
     }
     case "not": {
       const innerPredicate = predicateToWhereFilter(
-        predicateExpression.expression
+        predicateExpression.expression,
+        variables
       );
       return { NOT: innerPredicate };
     }
@@ -230,7 +244,10 @@ function predicateToWhereFilter(
       const operator = resolveBinaryComparisonOperator(
         predicateExpression.operator
       );
-      const value = resolveComparisonValue(predicateExpression.value);
+      const value = resolveComparisonValue(
+        predicateExpression.value,
+        variables
+      );
       return makeFilter(value, operator);
     }
     case "binary_array_comparison_operator": {
@@ -238,7 +255,9 @@ function predicateToWhereFilter(
         throw new Error("Operator is not supported");
       }
       const makeFilter = withResolvedTarget(predicateExpression.column);
-      const values = predicateExpression.values.map(resolveComparisonValue);
+      const values = predicateExpression.values.map((value: ComparisonValue) =>
+        resolveComparisonValue(value, variables)
+      );
       return makeFilter(values, "in");
     }
     case "exists":
@@ -251,18 +270,30 @@ function predicateToWhereFilter(
   }
 }
 
-function resolveComparisonValue(comparisonValue: ComparisonValue) {
+function resolveComparisonValue(
+  comparisonValue: ComparisonValue,
+  variables?: Record<string, unknown>
+) {
+  let value: unknown;
   switch (comparisonValue.type) {
     case "column":
       throw new Error("Comparing against columns is not supported");
     case "scalar":
-      if (typeof comparisonValue.value === "string") {
-        return `"${comparisonValue.value}"`;
+      value = comparisonValue.value;
+      break;
+
+    case "variable": {
+      if (!variables) {
+        throw new Error("Variables are being referenced but not provided");
       }
-      return comparisonValue.value;
-    case "variable":
-      return comparisonValue.name;
+      value = variables[comparisonValue.name];
+      break;
+    }
   }
+  if (typeof value === "string") {
+    return `"${value}"`;
+  }
+  return value;
 }
 
 function resolveBinaryComparisonOperator(operator: BinaryComparisonOperator) {
