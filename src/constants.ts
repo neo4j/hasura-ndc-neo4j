@@ -20,7 +20,32 @@ export const CAPABILITIES_RESPONSE: CapabilitiesResponse = {
 
 export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   Int: {
-    aggregate_functions: {},
+    aggregate_functions: {
+      min: {
+        result_type: {
+          type: "named",
+          name: "Int",
+        },
+      },
+      max: {
+        result_type: {
+          type: "named",
+          name: "Int",
+        },
+      },
+      average: {
+        result_type: {
+          type: "named",
+          name: "Int",
+        },
+      },
+      sum: {
+        result_type: {
+          type: "named",
+          name: "Int",
+        },
+      },
+    },
     comparison_operators: {
       not: {
         type: "custom",
@@ -60,7 +85,32 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
     },
   },
   Float: {
-    aggregate_functions: {},
+    aggregate_functions: {
+      min: {
+        result_type: {
+          type: "named",
+          name: "Float",
+        },
+      },
+      max: {
+        result_type: {
+          type: "named",
+          name: "Float",
+        },
+      },
+      average: {
+        result_type: {
+          type: "named",
+          name: "Float",
+        },
+      },
+      sum: {
+        result_type: {
+          type: "named",
+          name: "Float",
+        },
+      },
+    },
     comparison_operators: {
       not: {
         type: "custom",
@@ -112,7 +162,20 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
     },
   },
   String: {
-    aggregate_functions: {},
+    aggregate_functions: {
+      shortest: {
+        result_type: {
+          type: "named",
+          name: "String",
+        },
+      },
+      longest: {
+        result_type: {
+          type: "named",
+          name: "String",
+        },
+      },
+    },
     comparison_operators: {
       not: {
         type: "custom",
@@ -166,7 +229,20 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
     },
   },
   ID: {
-    aggregate_functions: {},
+    aggregate_functions: {
+      shortest: {
+        result_type: {
+          type: "named",
+          name: "ID",
+        },
+      },
+      longest: {
+        result_type: {
+          type: "named",
+          name: "ID",
+        },
+      },
+    },
     comparison_operators: {
       not: {
         type: "custom",
@@ -460,7 +536,32 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
     },
   },
   BigInt: {
-    aggregate_functions: {},
+    aggregate_functions: {
+      min: {
+        result_type: {
+          type: "named",
+          name: "BigInt",
+        },
+      },
+      max: {
+        result_type: {
+          type: "named",
+          name: "BigInt",
+        },
+      },
+      average: {
+        result_type: {
+          type: "named",
+          name: "BigInt",
+        },
+      },
+      sum: {
+        result_type: {
+          type: "named",
+          name: "BigInt",
+        },
+      },
+    },
     comparison_operators: {
       not: {
         type: "custom",
