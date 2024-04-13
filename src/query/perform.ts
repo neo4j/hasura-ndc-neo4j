@@ -1,7 +1,6 @@
 import { BadRequest } from "@hasura/ndc-sdk-typescript";
-import { Configuration, State } from "..";
-import { graphql, GraphQLSchema } from "graphql";
-import { Neo4jGraphQL } from "@neo4j/graphql";
+import { State } from "..";
+import { graphql } from "graphql";
 import { QueryPlan } from "../query/plan";
 
 /**
@@ -18,54 +17,14 @@ import { QueryPlan } from "../query/plan";
 export async function performQuery({
   queryPlan,
   state,
-  configuration,
   variables,
 }: {
-  queryPlan: QueryPlan;
-  state: State;
-  configuration: Configuration;
-  variables?: Record<string, unknown>;
-}): Promise<Record<string, any> | undefined | null> {
-  if (configuration.neoSchema) {
-    return executeQuery({
-      neoSchema: configuration.neoSchema,
-      queryPlan,
-      state,
-      variables,
-    });
-  }
-  const typeDefs = configuration.typedefs;
-  if (!typeDefs) {
-    throw new BadRequest("Typedefs not defined.", {});
-  }
-  try {
-    const neo4jGQL = new Neo4jGraphQL({
-      typeDefs,
-      driver: state.neo4j_driver,
-    });
-    const neoSchema = await neo4jGQL.getSchema();
-    return executeQuery({ neoSchema, queryPlan, state, variables });
-  } catch (err) {
-    throw new BadRequest("Code errors when executing query", {
-      err,
-      query: queryPlan.neo4jGraphQLQuery,
-    });
-  }
-}
-
-async function executeQuery({
-  neoSchema,
-  queryPlan,
-  state,
-  variables,
-}: {
-  neoSchema: GraphQLSchema;
   queryPlan: QueryPlan;
   state: State;
   variables?: Record<string, unknown>;
 }): Promise<Record<string, any> | undefined | null> {
   const result = await graphql({
-    schema: neoSchema,
+    schema: state.neoSchema,
     source: queryPlan.neo4jGraphQLQuery,
     contextValue: { executionContext: state.neo4j_driver },
     variableValues: variables,

@@ -32,7 +32,6 @@ export async function doQuery({
   const neo4jResults = await performQuery({
     queryPlan,
     state,
-    configuration,
     variables,
   });
   const resultingRows = transformResult(query, neo4jResults || {});

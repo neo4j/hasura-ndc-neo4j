@@ -9,7 +9,6 @@ import { toGenericStruct, toGraphQLTypeDefs } from "@neo4j/introspector";
 import { Neo4jStruct } from "@neo4j/introspector/dist/types";
 import Property from "@neo4j/introspector/dist/classes/Property";
 import { ObjectField, Type } from "@hasura/ndc-sdk-typescript";
-import { Neo4jGraphQL } from "@neo4j/graphql";
 
 /**
  * This is a fallback of the default mechanism of getting the data through the configuration object.
@@ -30,13 +29,7 @@ export async function doUpdateConfiguration(
   const driver = getNeo4jDriver(configuration);
   const typeDefs = await toGraphQLTypeDefs(() => driver.session());
   console.log("typeDefs", typeDefs);
-  const neo4jGQL = new Neo4jGraphQL({
-    typeDefs,
-    driver,
-  });
-  const neoSchema = await neo4jGQL.getSchema();
-  configuration.typedefs = typeDefs;
-  configuration.neoSchema = neoSchema;
+  configuration.typeDefs = typeDefs;
 
   // TODO: result of toGenericStruct may differ from what toGraphQLTypeDefs used to generate the typedefs string
   // ideally change the introspector to return typedefs and also the struct it used to generate them
