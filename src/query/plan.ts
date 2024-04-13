@@ -7,10 +7,8 @@ import {
   OrderBy,
   OrderByElement,
   Query,
-  BinaryComparisonOperator,
   ComparisonValue,
   PathElement,
-  // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { ConfigurationSchema } from "..";
 import { lowerFirst, toSingular } from "../utilities";
@@ -81,7 +79,7 @@ function makeGQLQuery({
     });
   }
 
-  const { limit, offset, where, order_by: orderBy, fields } = query;
+  const { limit, offset, predicate: where, order_by: orderBy, fields } = query;
 
   const individualCollectionName: string = toSingular(collectionName);
   if (!fields) {
@@ -250,16 +248,6 @@ function predicateToWhereFilter(
       );
       return makeFilter(value, operator);
     }
-    case "binary_array_comparison_operator": {
-      if (predicateExpression.operator !== "in") {
-        throw new Error("Operator is not supported");
-      }
-      const makeFilter = withResolvedTarget(predicateExpression.column);
-      const values = predicateExpression.values.map((value: ComparisonValue) =>
-        resolveComparisonValue(value, variables)
-      );
-      return makeFilter(values, "in");
-    }
     case "exists":
       // in_collection: ExistsInCollection;
       // where: Expression;
@@ -296,12 +284,12 @@ function resolveComparisonValue(
   return value;
 }
 
-function resolveBinaryComparisonOperator(operator: BinaryComparisonOperator) {
-  switch (operator.type) {
-    case "equal":
+function resolveBinaryComparisonOperator(operator: string) {
+  switch (operator) {
+    case "eq":
       return "";
     case "other":
-      return `_${operator.name.toUpperCase()}`;
+      return `_${operator.toUpperCase()}`;
     default:
       throw Error("Operator not supported");
   }

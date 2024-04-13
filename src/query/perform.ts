@@ -1,7 +1,4 @@
-import {
-  BadRequest,
-  // @ts-ignore
-} from "@hasura/ndc-sdk-typescript";
+import { BadRequest } from "@hasura/ndc-sdk-typescript";
 import { Configuration, State } from "..";
 import { graphql, GraphQLSchema } from "graphql";
 import { Neo4jGraphQL } from "@neo4j/graphql";

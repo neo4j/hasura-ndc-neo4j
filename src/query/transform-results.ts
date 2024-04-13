@@ -4,7 +4,6 @@ import {
   Query,
   RowFieldValue,
   RowSet,
-  // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { asArray, lowerFirst } from "../utilities";
 

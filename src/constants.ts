@@ -2,18 +2,18 @@ import {
   CapabilitiesResponse,
   ScalarType,
   ObjectType,
-  // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { JSONSchemaObject } from "@json-schema-tools/meta-schema";
 
 export const CAPABILITIES_RESPONSE: CapabilitiesResponse = {
-  versions: "^0.1.0",
+  version: "^0.1.0",
   capabilities: {
     query: {
       aggregates: {},
       variables: {},
+      explain: {},
     },
-    explain: {},
+    mutation: {},
     relationships: { relation_comparisons: {}, order_by_aggregate: {} },
   },
 };
@@ -47,6 +47,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
       },
     },
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -112,6 +113,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
       },
     },
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -152,6 +154,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   Boolean: {
     aggregate_functions: {},
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -177,6 +180,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
       },
     },
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -244,6 +248,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
       },
     },
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -298,6 +303,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   DateTime: {
     aggregate_functions: {},
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -338,6 +344,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   Date: {
     aggregate_functions: {},
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -378,6 +385,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   Duration: {
     aggregate_functions: {},
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -418,6 +426,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   LocalDateTime: {
     aggregate_functions: {},
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -458,6 +467,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   LocalTime: {
     aggregate_functions: {},
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -498,6 +508,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   Time: {
     aggregate_functions: {},
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {
@@ -563,6 +574,7 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
       },
     },
     comparison_operators: {
+      eq: { type: "equal" },
       not: {
         type: "custom",
         argument_type: {

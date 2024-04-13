@@ -2,7 +2,6 @@ import {
   BadRequest,
   ExplainResponse,
   QueryRequest,
-  // @ts-ignore
 } from "@hasura/ndc-sdk-typescript";
 import { Configuration } from "..";
 import { QueryPlan, planQuery } from "../query/plan";

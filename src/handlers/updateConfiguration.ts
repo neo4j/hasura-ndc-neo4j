@@ -8,7 +8,6 @@ import {
 import { toGenericStruct, toGraphQLTypeDefs } from "@neo4j/introspector";
 import { Neo4jStruct } from "@neo4j/introspector/dist/types";
 import Property from "@neo4j/introspector/dist/classes/Property";
-// @ts-ignore
 import { ObjectField, Type } from "@hasura/ndc-sdk-typescript";
 import { Neo4jGraphQL } from "@neo4j/graphql";
 
@@ -42,7 +41,9 @@ export async function doUpdateConfiguration(
   // TODO: result of toGenericStruct may differ from what toGraphQLTypeDefs used to generate the typedefs string
   // ideally change the introspector to return typedefs and also the struct it used to generate them
   const genericStruct = await toGenericStruct(() => driver.session());
-  console.log("genericStruct", genericStruct);
+  await driver.close();
+
+  // console.log("genericStruct", genericStruct);
   const collectionNames = Object.values(genericStruct.nodes)
     .map((n) => n.labels[0])
     .map(toPlural);

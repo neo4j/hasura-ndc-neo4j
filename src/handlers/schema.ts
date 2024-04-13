@@ -1,4 +1,3 @@
-// @ts-ignore
 import { SchemaResponse, CollectionInfo } from "@hasura/ndc-sdk-typescript";
 import { ConfigurationSchema } from "..";
 import { SCALAR_TYPES } from "../constants";

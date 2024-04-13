@@ -1,9 +1,4 @@
-import {
-  QueryRequest,
-  BadRequest,
-  RowSet,
-  // @ts-ignore
-} from "@hasura/ndc-sdk-typescript";
+import { QueryRequest, BadRequest, RowSet } from "@hasura/ndc-sdk-typescript";
 import { Configuration, State } from "..";
 import { planQuery } from "../query/plan";
 import { performQuery } from "../query/perform";
