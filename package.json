@@ -9,13 +9,13 @@
     "test": "jest --detectOpenHandles"
   },
   "dependencies": {
-    "@hasura/ndc-sdk-typescript": "^1.4.0",
+    "@hasura/ndc-sdk-typescript": "^4.4.0",
     "@json-schema-tools/meta-schema": "^1.7.0",
-    "@neo4j/graphql": "^4.4.1",
-    "@neo4j/introspector": "^2.0.0",
+    "@neo4j/graphql": "^5.3.2",
+    "@neo4j/introspector": "^3.0.0",
     "@types/node": "^20.6.0",
     "camelcase": "^6.3.0",
-    "commander": "^11.0.0",
+    "commander": "^12.0.0",
     "fastify": "^4.23.2",
     "json-schema-to-ts": "^2.9.2",
     "json-schema-to-typescript": "^13.1.1",
@@ -25,6 +25,7 @@
     "typescript": "^5.2.2"
   },
   "devDependencies": {
+    "@commander-js/extra-typings": "^12.0.1",
     "@tsconfig/node16": "^1.0.3",
     "@types/jest": "^29.5.5",
     "@types/node": "^16.18.50",
