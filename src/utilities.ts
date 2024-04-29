@@ -1,14 +1,5 @@
-import { Configuration } from ".";
-import neo4j, { Driver } from "neo4j-driver";
 import camelcase from "camelcase";
 import pluralize, { singular } from "pluralize";
-
-export function getNeo4jDriver(configuration: Configuration): Driver {
-  return neo4j.driver(
-    configuration.neo4j_url,
-    neo4j.auth.basic(configuration.neo4j_user, configuration.neo4j_pass)
-  );
-}
 
 export function toPlural(name: string) {
   return pluralize(name);

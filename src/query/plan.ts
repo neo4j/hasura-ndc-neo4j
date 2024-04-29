@@ -288,10 +288,8 @@ function resolveBinaryComparisonOperator(operator: string) {
   switch (operator) {
     case "eq":
       return "";
-    case "other":
-      return `_${operator.toUpperCase()}`;
     default:
-      throw Error("Operator not supported");
+      return `_${operator.toUpperCase()}`;
   }
 }
 

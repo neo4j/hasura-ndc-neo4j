@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./src/index.ts serve --configuration=configuration.json",
+    "start": "ts-node ./src/index.ts serve --configuration=./ --port=8080",
     "start-server": "ts-node ./src/index.ts configuration serve",
-    "start:test": "ts-node ./src/index.ts serve --configuration=__tests__/data/configuration.json",
+    "start:test": "ts-node ./src/index.ts serve --configuration=__tests__/data/ --port=8080",
     "test": "jest --detectOpenHandles"
   },
   "dependencies": {

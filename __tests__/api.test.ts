@@ -1,8 +1,7 @@
 import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
-import { Driver } from "neo4j-driver";
-import { getNeo4jDriver } from "../src/utilities";
+import { Neo4j } from "../src/neo4j";
 
 describe("API Tests", () => {
   const baseDir = path.resolve(__dirname, "./requests");
@@ -15,17 +14,24 @@ describe("API Tests", () => {
     path.resolve(baseDir, "movies"),
     // path.resolve(baseDir, "actors"), Hasura does not seem to support nested fields, Point and CartesianPoint are nested
   ];
-  let driver: Driver | undefined = undefined;
+  const neo4jInstance = Neo4j.getInstance();
+  let cleanupStatement: string | undefined;
 
   async function loadDataFromFile(filePath: string) {
     const data = await fs.promises.readFile(filePath, "utf-8");
     return JSON.parse(data);
   }
 
-  async function setupDatabase() {
+  async function generateCypherStatements(): Promise<{
+    create: string[];
+    cleanup: string[];
+  }> {
     const configuration = await loadDataFromFile(configurationFile);
     const data = await loadDataFromFile(dataFile);
-    const createStatements = [];
+    const statements: { create: string[]; cleanup: string[] } = {
+      create: [],
+      cleanup: [],
+    };
     for (const label in data) {
       const nodesForLabel: Record<string, any>[] = data[label];
       for (const node of nodesForLabel) {
@@ -38,37 +44,40 @@ describe("API Tests", () => {
           }
           return `${fieldName}: ${value}`;
         });
-        createStatements.push(`CREATE (:${label} {${nodeFields.join(", ")}})`);
+        statements.create.push(`CREATE (:${label} {${nodeFields.join(", ")}})`);
+        statements.cleanup.push(
+          `MATCH (n:${label} {${nodeFields.join(", ")}}) DETACH DELETE n`
+        );
       }
     }
+    return statements;
+  }
+
+  async function setupDatabase(createStatement: string) {
     try {
-      const insertQuery = createStatements.join("\n");
-      console.log("executing query", insertQuery);
-      driver = getNeo4jDriver(configuration);
-      await driver.executeQuery(insertQuery);
+      console.log("Setting up database, executing query", createStatement);
+      await neo4jInstance.getDriver().executeQuery(createStatement);
     } catch (err) {
       console.error("error:", err);
       throw new Error(`Error while db set-up: ${err}`);
+    } finally {
+      await neo4jInstance.cleanDriver();
     }
   }
 
   beforeAll(async () => {
-    await setupDatabase();
+    const { create, cleanup } = await generateCypherStatements();
+    await setupDatabase(create.join("\n"));
+    cleanupStatement = cleanup.join("\n");
   });
 
   afterAll(async () => {
-    if (!driver) {
-      console.log("Cannot find driver. Unable to cleanup.");
-      return;
+    if (!cleanupStatement) {
+      console.log("No data to cleanup");
+    } else {
+      await neo4jInstance.getDriver().executeQuery(cleanupStatement);
     }
-    const configuration = await loadDataFromFile(configurationFile);
-
-    for (const label of configuration.config.collection_names) {
-      const individualCollectionName: string = label.slice(0, -1);
-      await driver.executeQuery(
-        `MATCH (n: ${individualCollectionName}) DETACH DELETE n`
-      );
-    }
+    await neo4jInstance.cleanDriver();
   });
 
   testDirs.forEach((testDir) => {
@@ -87,7 +96,7 @@ describe("API Tests", () => {
           //   try {
           const apiResponse = await axios({
             method,
-            url: `http://127.0.0.1:8100/${url}`,
+            url: `http://127.0.0.1:8080/${url}`,
             data: request,
           });
           expect(apiResponse.data).toEqual(response);

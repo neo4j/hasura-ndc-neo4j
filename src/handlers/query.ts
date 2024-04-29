@@ -1,5 +1,5 @@
-import { QueryRequest, BadRequest, RowSet } from "@hasura/ndc-sdk-typescript";
-import { Configuration, State } from "..";
+import { QueryRequest, RowSet } from "@hasura/ndc-sdk-typescript";
+import { ConfigurationSchema, State } from "..";
 import { planQuery } from "../query/plan";
 import { performQuery } from "../query/perform";
 import { transformResult } from "../query/transform-results";
@@ -16,19 +16,16 @@ import { transformResult } from "../query/transform-results";
 export async function doQuery({
   query,
   state,
-  configuration,
+  config,
   variables,
 }: {
   query: QueryRequest;
   state: State;
-  configuration: Configuration;
+  config: ConfigurationSchema;
   variables?: Record<string, unknown>;
 }): Promise<RowSet> {
   console.log("got query", JSON.stringify(query, null, 2));
-  if (!configuration.config) {
-    throw new BadRequest("Config is not configured", {});
-  }
-  const queryPlan = await planQuery(query, configuration.config, variables);
+  const queryPlan = await planQuery(query, config, variables);
   const neo4jResults = await performQuery({
     queryPlan,
     state,

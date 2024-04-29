@@ -13,14 +13,6 @@
         "name": {
           "type": "column",
           "column": "name"
-        },
-        "bornIn": {
-          "type": "column",
-          "column": "bornIn"
-        },
-        "livesIn": {
-          "type": "column",
-          "column": "livesIn"
         }
       }
     },
@@ -31,99 +23,67 @@
       "rows": [
         {
           "id": 0,
-          "name": "Keanu Reeves",
-          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
-          "livesIn": "point({x: 2.3, y: 4.5, z: 2})"
+          "name": "Keanu Reeves"
         },
         {
           "id": 1,
-          "name": "Robert De Niro",
-          "bornIn": "point({longitude: 55.7, latitude: 12.78, height: 8})",
-          "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
+          "name": "Robert De Niro"
         },
         {
           "id": 2,
-          "name": "Carrie-Anne Moss",
-          "bornIn": "point({longitude: 56.7, latitude: 11.78, height: 8})",
-          "livesIn": "point({x: 2.3, y: 2.5, z: 2})"
+          "name": "Carrie-Anne Moss"
         },
         {
           "id": 3,
-          "name": "Laurence Fishburne",
-          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
-          "livesIn": "point({x: 2.3, y: 4.5, z: 3})"
+          "name": "Laurence Fishburne"
         },
         {
           "id": 4,
-          "name": "Rachel Weisz",
-          "bornIn": "point({longitude: 50, latitude: 15, height: 8})",
-          "livesIn": "point({x: 2, y: 4, z: 2})"
+          "name": "Rachel Weisz"
         },
         {
           "id": 5,
-          "name": "Vin Diesel",
-          "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
-          "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
+          "name": "Vin Diesel"
         },
         {
           "id": 6,
-          "name": "Meryl Streep",
-          "bornIn": "point({longitude: 56.7, latitude: 15, height: 9})",
-          "livesIn": "point({x: 2.3, y: 5, z: 2})"
+          "name": "Meryl Streep"
         },
         {
           "id": 7,
-          "name": "Colin Firth",
-          "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
-          "livesIn": "point({x: 2.3, y: 4.5, z: 3})"
+          "name": "Colin Firth"
         },
         {
           "id": 8,
-          "name": "Julie Walters",
-          "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
-          "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
+          "name": "Julie Walters"
         },
         {
           "id": 9,
-          "name": "Dominic Cooper",
-          "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
-          "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
+          "name": "Dominic Cooper"
         },
         {
           "id": 10,
-          "name": "Al Pacino",
-          "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
-          "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
+          "name": "Al Pacino"
         },
         {
           "id": 11,
-          "name": "Marlon Brando",
-          "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
-          "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
+          "name": "Marlon Brando"
         },
         {
           "id": 12,
-          "name": "Diane Keaton",
-          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
-          "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
+          "name": "Diane Keaton"
         },
         {
           "id": 13,
-          "name": "John Cazale",
-          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
-          "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
+          "name": "John Cazale"
         },
         {
           "id": 14,
-          "name": "Zoe Saldana",
-          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
-          "livesIn": "point({x: 2, y: 4, z: 2})"
+          "name": "Zoe Saldana"
         },
         {
           "id": 15,
-          "name": "Kate Winslet",
-          "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
-          "livesIn": "point({x: 2, y: 4, z: 2})"
+          "name": "Kate Winslet"
         }
       ]
     }

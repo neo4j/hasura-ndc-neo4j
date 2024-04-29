@@ -1,14 +1,11 @@
 import { Configuration, ConfigurationSchema } from "..";
 import { BASE_TYPES, assertTypeNameIsRestricted } from "../constants";
-import {
-  getNeo4jDriver,
-  inferRelationshipFieldName,
-  toPlural,
-} from "../utilities";
+import { inferRelationshipFieldName, toPlural } from "../utilities";
 import { toGenericStruct, toGraphQLTypeDefs } from "@neo4j/introspector";
 import { Neo4jStruct } from "@neo4j/introspector/dist/types";
 import Property from "@neo4j/introspector/dist/classes/Property";
 import { ObjectField, Type } from "@hasura/ndc-sdk-typescript";
+import { Neo4j } from "../neo4j";
 
 /**
  * This is a fallback of the default mechanism of getting the data through the configuration object.
@@ -21,12 +18,7 @@ import { ObjectField, Type } from "@hasura/ndc-sdk-typescript";
 export async function doUpdateConfiguration(
   configuration: Configuration
 ): Promise<Configuration> {
-  // if (configuration.config) {
-  //   // TODO: fix tests (they start with config but I removed logic to make schema from config)
-  //   return configuration;
-  // }
-
-  const driver = getNeo4jDriver(configuration);
+  const driver = Neo4j.getInstance().getDriver();
   const typeDefs = await toGraphQLTypeDefs(() => driver.session());
   console.log("typeDefs", typeDefs);
   configuration.typeDefs = typeDefs;
@@ -34,9 +26,7 @@ export async function doUpdateConfiguration(
   // TODO: result of toGenericStruct may differ from what toGraphQLTypeDefs used to generate the typedefs string
   // ideally change the introspector to return typedefs and also the struct it used to generate them
   const genericStruct = await toGenericStruct(() => driver.session());
-  await driver.close();
 
-  // console.log("genericStruct", genericStruct);
   const collectionNames = Object.values(genericStruct.nodes)
     .map((n) => n.labels[0])
     .map(toPlural);

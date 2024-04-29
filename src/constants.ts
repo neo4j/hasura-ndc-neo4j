@@ -9,11 +9,14 @@ export const CAPABILITIES_RESPONSE: CapabilitiesResponse = {
   version: "^0.1.0",
   capabilities: {
     query: {
-      aggregates: {},
+      aggregates: null,
       variables: {},
       explain: {},
     },
-    mutation: {},
+    mutation: {
+      transactional: null,
+      explain: null,
+    },
     relationships: { relation_comparisons: {}, order_by_aggregate: {} },
   },
 };
@@ -698,96 +701,97 @@ export const SCALAR_TYPES: { [key: string]: ScalarType } = {
   // },
 };
 
-// TODO: maybe add input objects and enums here
+// Point and CartesianPoint should be added here when Hasura adds support for ObjectType fields
+// Alternatively if needed, we could work around this limitation by implementing some Native Queries like Postgres does
 export const BASE_TYPES: { [k: string]: ObjectType } = {
-  Point: {
-    description:
-      "A point in a coordinate system. For more information, see https://neo4j.com/docs/graphql/4/type-definitions/types/spatial/#point",
-    fields: {
-      longitude: {
-        description: null,
-        type: {
-          type: "named",
-          name: "Float",
-        },
-      },
-      latitude: {
-        description: null,
-        type: {
-          type: "named",
-          name: "Float",
-        },
-      },
-      height: {
-        description: null,
-        type: {
-          type: "nullable",
-          underlying_type: {
-            type: "named",
-            name: "Float",
-          },
-        },
-      },
-      crs: {
-        description: null,
-        type: {
-          type: "named",
-          name: "String",
-        },
-      },
-      srid: {
-        description: null,
-        type: {
-          type: "named",
-          name: "Int",
-        },
-      },
-    },
-  },
-  CartesianPoint: {
-    description:
-      "A point in a two- or three-dimensional Cartesian coordinate system or in a three-dimensional cylindrical coordinate system. For more information, see https://neo4j.com/docs/graphql/4/type-definitions/types/spatial/#cartesian-point",
-    fields: {
-      x: {
-        description: null,
-        type: {
-          type: "named",
-          name: "Float",
-        },
-      },
-      y: {
-        description: null,
-        type: {
-          type: "named",
-          name: "Float",
-        },
-      },
-      z: {
-        description: null,
-        type: {
-          type: "nullable",
-          underlying_type: {
-            type: "named",
-            name: "Float",
-          },
-        },
-      },
-      crs: {
-        description: null,
-        type: {
-          type: "named",
-          name: "String",
-        },
-      },
-      srid: {
-        description: null,
-        type: {
-          type: "named",
-          name: "Int",
-        },
-      },
-    },
-  },
+  // Point: {
+  //   description:
+  //     "A point in a coordinate system. For more information, see https://neo4j.com/docs/graphql/4/type-definitions/types/spatial/#point",
+  //   fields: {
+  //     longitude: {
+  //       description: null,
+  //       type: {
+  //         type: "named",
+  //         name: "Float",
+  //       },
+  //     },
+  //     latitude: {
+  //       description: null,
+  //       type: {
+  //         type: "named",
+  //         name: "Float",
+  //       },
+  //     },
+  //     height: {
+  //       description: null,
+  //       type: {
+  //         type: "nullable",
+  //         underlying_type: {
+  //           type: "named",
+  //           name: "Float",
+  //         },
+  //       },
+  //     },
+  //     crs: {
+  //       description: null,
+  //       type: {
+  //         type: "named",
+  //         name: "String",
+  //       },
+  //     },
+  //     srid: {
+  //       description: null,
+  //       type: {
+  //         type: "named",
+  //         name: "Int",
+  //       },
+  //     },
+  //   },
+  // },
+  // CartesianPoint: {
+  //   description:
+  //     "A point in a two- or three-dimensional Cartesian coordinate system or in a three-dimensional cylindrical coordinate system. For more information, see https://neo4j.com/docs/graphql/4/type-definitions/types/spatial/#cartesian-point",
+  //   fields: {
+  //     x: {
+  //       description: null,
+  //       type: {
+  //         type: "named",
+  //         name: "Float",
+  //       },
+  //     },
+  //     y: {
+  //       description: null,
+  //       type: {
+  //         type: "named",
+  //         name: "Float",
+  //       },
+  //     },
+  //     z: {
+  //       description: null,
+  //       type: {
+  //         type: "nullable",
+  //         underlying_type: {
+  //           type: "named",
+  //           name: "Float",
+  //         },
+  //       },
+  //     },
+  //     crs: {
+  //       description: null,
+  //       type: {
+  //         type: "named",
+  //         name: "String",
+  //       },
+  //     },
+  //     srid: {
+  //       description: null,
+  //       type: {
+  //         type: "named",
+  //         name: "Int",
+  //       },
+  //     },
+  //   },
+  // },
 };
 
 // field names that are not valid

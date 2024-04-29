@@ -1,20 +1,13 @@
-import {
-  BadRequest,
-  ExplainResponse,
-  QueryRequest,
-} from "@hasura/ndc-sdk-typescript";
-import { Configuration } from "..";
+import { ExplainResponse, QueryRequest } from "@hasura/ndc-sdk-typescript";
+import { ConfigurationSchema } from "..";
 import { QueryPlan, planQuery } from "../query/plan";
 
 export async function doExplain(
   query: QueryRequest,
-  configuration: Configuration
+  config: ConfigurationSchema
 ): Promise<ExplainResponse> {
   try {
-    if (!configuration.config) {
-      throw new BadRequest("Config is not configured", {});
-    }
-    let queryPlan: QueryPlan = await planQuery(query, configuration.config);
+    let queryPlan: QueryPlan = await planQuery(query, config);
     return {
       details: {
         queryRequest: JSON.stringify(query),

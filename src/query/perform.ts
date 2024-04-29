@@ -26,7 +26,7 @@ export async function performQuery({
   const result = await graphql({
     schema: state.neoSchema,
     source: queryPlan.neo4jGraphQLQuery,
-    contextValue: { executionContext: state.neo4j_driver },
+    contextValue: { executionContext: state.neo4jInstance.getDriver() },
     variableValues: variables,
   });
   if (result.errors) {

@@ -6,6 +6,7 @@
       "releasedIn": "datetime({year: 2020, month: 11, day: 9, hour: 11, minute: 29, second: 56, timezone: '+03:00'})",
       "year": "2020-11-09",
       "isPublic": true,
+      "screenTime": "duration({minutes: 120})",
       "releasedInLocal": "localdatetime({year: 2020, month: 11, day: 9})",
       "time": "time({hour: 11, minute: 29, second: 56, timezone: '+03:00'})",
       "timeLocal": "localtime({hour: 11, minute: 29, second: 56})",
@@ -17,6 +18,7 @@
       "releasedIn": "datetime({year: 2021, month: 11, day: 12, hour: 12, minute: 29, second: 56, timezone: '+03:00'})",
       "year": "2021-11-12",
       "isPublic": false,
+      "screenTime": "duration({minutes: 150})",
       "releasedInLocal": "localdatetime({year: 2021, month: 11, day: 12})",
       "time": "time({hour: 12, minute: 29, second: 56, timezone: '+03:00'})",
       "timeLocal": "localtime({hour: 12, minute: 29, second: 56})",
@@ -28,6 +30,7 @@
       "releasedIn": "datetime({year: 2023, month: 11, day: 21, hour: 9, minute: 30, second: 56, timezone: '+03:00'})",
       "year": "2023-11-21",
       "isPublic": true,
+      "screenTime": "duration({minutes: 180})",
       "releasedInLocal": "localdatetime({year: 2023, month: 11, day: 21})",
       "time": "time({hour: 9, minute: 30, second: 56, timezone: '+03:00'})",
       "timeLocal": "localtime({hour: 9, minute: 30, second: 56})",
@@ -39,6 +42,7 @@
       "releasedIn": "datetime({year: 1995, month: 7, day: 11, hour: 11, minute: 32, second: 56, timezone: '+03:00'})",
       "year": "1995-07-11",
       "isPublic": true,
+      "screenTime": "duration({minutes: 120})",
       "releasedInLocal": "localdatetime({year: 1995, month: 7, day: 11})",
       "time": "time({hour: 11, minute: 32, second: 56, timezone: '+03:00'})",
       "timeLocal": "localtime({hour: 11, minute: 32, second: 56})",
@@ -50,6 +54,7 @@
       "releasedIn": "datetime({year: 2000, month: 8, day: 21, hour: 11, minute: 59, second: 1, timezone: '+03:00'})",
       "year": "2000-08-21",
       "isPublic": false,
+      "screenTime": "duration({minutes: 90})",
       "releasedInLocal": "localdatetime({year: 2000, month: 8, day: 21})",
       "time": "time({hour: 11, minute: 59, second: 1, timezone: '+03:00'})",
       "timeLocal": "localtime({hour: 11, minute: 59, second: 1})",
@@ -61,6 +66,7 @@
       "releasedIn": "datetime({year: 2002, month: 1, day: 2, hour: 10, minute: 2, timezone: '+03:00'})",
       "year": "2002-01-02",
       "isPublic": true,
+      "screenTime": "duration({minutes: 180})",
       "releasedInLocal": "localdatetime({year: 2002, month: 1, day: 2})",
       "time": "time({hour: 10, minute: 2, timezone: '+03:00'})",
       "timeLocal": "localtime({hour: 10, minute: 2})",
@@ -71,82 +77,98 @@
     {
       "id": 0,
       "name": "Keanu Reeves",
-      "car": "Ford"
+      "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
+      "livesIn": "point({x: 2.3, y: 4.5, z: 2})"
     },
     {
       "id": 1,
       "name": "Robert De Niro",
-      "car": "Ferrari"
+      "bornIn": "point({longitude: 55.7, latitude: 12.78, height: 8})",
+      "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
     },
     {
       "id": 2,
       "name": "Carrie-Anne Moss",
-      "car": "Ford"
+      "bornIn": "point({longitude: 56.7, latitude: 11.78, height: 8})",
+      "livesIn": "point({x: 2.3, y: 2.5, z: 2})"
     },
     {
       "id": 3,
       "name": "Laurence Fishburne",
-      "car": "Ferrari"
+      "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
+      "livesIn": "point({x: 2.3, y: 4.5, z: 3})"
     },
     {
       "id": 4,
       "name": "Rachel Weisz",
-      "car": "Ford"
+      "bornIn": "point({longitude: 50, latitude: 15, height: 8})",
+      "livesIn": "point({x: 2, y: 4, z: 2})"
     },
     {
       "id": 5,
       "name": "Vin Diesel",
-      "car": "Ferrari"
+      "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
+      "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
     },
     {
       "id": 6,
       "name": "Meryl Streep",
-      "car": "Ford"
+      "bornIn": "point({longitude: 56.7, latitude: 15, height: 9})",
+      "livesIn": "point({x: 2.3, y: 5, z: 2})"
     },
     {
       "id": 7,
       "name": "Colin Firth",
-      "car": "VW"
+      "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
+      "livesIn": "point({x: 2.3, y: 4.5, z: 3})"
     },
     {
       "id": 8,
       "name": "Julie Walters",
-      "car": "Ford"
+      "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
+      "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
     },
     {
       "id": 9,
       "name": "Dominic Cooper",
-      "car": "VW"
+      "bornIn": "point({longitude: 50, latitude: 10, height: 10})",
+      "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
     },
     {
       "id": 10,
       "name": "Al Pacino",
-      "car": "Ford"
+      "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
+      "livesIn": "point({x: 1.3, y: 4.5, z: 2})"
     },
     {
       "id": 11,
       "name": "Marlon Brando",
-      "car": "VW"
+      "bornIn": "point({longitude: 66.7, latitude: 22.78, height: 8})",
+      "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
     },
     {
       "id": 12,
       "name": "Diane Keaton",
-      "car": "Ford"
+      "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
+      "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
     },
     {
       "id": 13,
       "name": "John Cazale",
-      "car": "VW"
+      "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 10})",
+      "livesIn": "point({x: 3.3, y: 4.5, z: 2})"
     },
     {
       "id": 14,
       "name": "Zoe Saldana",
-      "car": "Ford"
+      "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
+      "livesIn": "point({x: 2, y: 4, z: 2})"
     },
     {
       "id": 15,
       "name": "Kate Winslet",
-      "car": "VW"
+      "bornIn": "point({longitude: 56.7, latitude: 12.78, height: 8})",
+      "livesIn": "point({x: 2, y: 4, z: 2})"
     }
   ]
 }

@@ -1,97 +1,46 @@
 {
-  "neo4j_url": "",
-  "neo4j_user": "",
-  "neo4j_pass": "",
+  "typeDefs": "type ActedInProperties @relationshipProperties {\n\tyear: BigInt!\n}\n\ntype Actor {\n\tactedInMovies: [Movie!]! @relationship(type: \"ACTED_IN\", direction: OUT, properties: \"ActedInProperties\")\n\tid: Int!\n\tcar: String!\n\tname: String!\n}\n\ntype Movie {\n\tactorsActedIn: [Actor!]! @relationship(type: \"ACTED_IN\", direction: IN, properties: \"ActedInProperties\")\n\tid: Int!\n\ttitle: String!\n\treleasedIn: DateTime!\n\tyear: Date!\n\tisPublic: Boolean!\n\treleasedInLocal: LocalDateTime!\n\ttime: Time!\n\ttimeLocal: LocalTime!\n\tsize: BigInt!\n}",
   "config": {
     "collection_names": ["Movies", "Actors"],
-    "object_fields": {
-      "Movie": [
-        "id",
-        "title",
-        "year",
-        "isPublic",
-        "screenTime",
-        "releasedIn",
-        "releasedInLocal",
-        "time",
-        "timeLocal",
-        "size"
-      ],
-      "Actor": ["id", "name", "bornIn", "livesIn"]
-    },
     "object_types": {
       "Movie": {
         "description": null,
         "fields": {
           "id": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "Int"
-            }
+            "type": { "type": "named", "name": "Int" }
           },
           "title": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "String"
-            }
-          },
-          "isPublic": {
-            "description": null,
-            "type": {
-              "type": "named",
-              "name": "Boolean"
-            }
-          },
-          "screenTime": {
-            "description": null,
-            "type": {
-              "type": "named",
-              "name": "Duration"
-            }
-          },
-          "year": {
-            "description": null,
-            "type": {
-              "type": "named",
-              "name": "Date"
-            }
+            "type": { "type": "named", "name": "String" }
           },
           "releasedIn": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "DateTime"
-            }
+            "type": { "type": "named", "name": "DateTime" }
+          },
+          "year": {
+            "description": null,
+            "type": { "type": "named", "name": "Date" }
+          },
+          "isPublic": {
+            "description": null,
+            "type": { "type": "named", "name": "Boolean" }
           },
           "releasedInLocal": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "LocalDateTime"
-            }
+            "type": { "type": "named", "name": "LocalDateTime" }
           },
           "time": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "Time"
-            }
+            "type": { "type": "named", "name": "Time" }
           },
           "timeLocal": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "LocalTime"
-            }
+            "type": { "type": "named", "name": "LocalTime" }
           },
           "size": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "BigInt"
-            }
+            "type": { "type": "named", "name": "BigInt" }
           }
         }
       },
@@ -100,34 +49,47 @@
         "fields": {
           "id": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "Int"
-            }
+            "type": { "type": "named", "name": "Int" }
           },
           "name": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "String"
-            }
+            "type": { "type": "named", "name": "String" }
           },
-          "bornIn": {
+          "car": {
             "description": null,
-            "type": {
-              "type": "named",
-              "name": "Point"
-            }
-          },
-          "livesIn": {
-            "description": null,
-            "type": {
-              "type": "named",
-              "name": "CartesianPoint"
-            }
+            "type": { "type": "named", "name": "String" }
           }
         }
       }
+    },
+    "foreign_keys": {
+      "Actor": {
+        "actedInMovies": {
+          "foreign_collection": "Movies",
+          "column_mapping": { "name": "title" }
+        }
+      },
+      "Movie": {
+        "actorsActedIn": {
+          "foreign_collection": "Actors",
+          "column_mapping": { "title": "name" }
+        }
+      }
+    },
+    "uniqueness_constraints": {},
+    "object_fields": {
+      "Movie": [
+        "id",
+        "title",
+        "releasedIn",
+        "year",
+        "isPublic",
+        "releasedInLocal",
+        "time",
+        "timeLocal",
+        "size"
+      ],
+      "Actor": ["id", "name", "car"]
     },
     "functions": [],
     "procedures": []

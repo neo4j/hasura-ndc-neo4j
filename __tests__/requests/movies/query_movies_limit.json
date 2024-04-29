@@ -25,10 +25,6 @@
         "year": {
           "type": "column",
           "column": "year"
-        },
-        "screenTime": {
-          "type": "column",
-          "column": "screenTime"
         }
       },
       "limit": 2
@@ -43,16 +39,14 @@
           "title": "The Matrix",
           "isPublic": true,
           "releasedIn": "2020-11-09T08:29:56.000Z",
-          "year": "2020-11-09",
-          "screenTime": "P0M0DT7200S"
+          "year": "2020-11-09"
         },
         {
           "id": 2,
           "title": "Constantine",
           "isPublic": false,
           "releasedIn": "2021-11-12T09:29:56.000Z",
-          "year": "2021-11-12",
-          "screenTime": "P0M0DT9000S"
+          "year": "2021-11-12"
         }
       ]
     }

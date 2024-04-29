@@ -25,10 +25,6 @@
         "year": {
           "type": "column",
           "column": "year"
-        },
-        "screenTime": {
-          "type": "column",
-          "column": "screenTime"
         }
       },
       "limit": 2,
@@ -44,16 +40,14 @@
           "title": "The Godfather",
           "isPublic": true,
           "releasedIn": "1995-07-11T08:32:56.000Z",
-          "year": "1995-07-11",
-          "screenTime": "P0M0DT7200S"
+          "year": "1995-07-11"
         },
         {
           "id": 5,
           "title": "Cats",
           "isPublic": false,
           "releasedIn": "2000-08-21T08:59:01.000Z",
-          "year": "2000-08-21",
-          "screenTime": "P0M0DT5400S"
+          "year": "2000-08-21"
         }
       ]
     }

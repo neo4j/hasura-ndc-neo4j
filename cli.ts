@@ -1,7 +1,8 @@
 import { Command } from "@commander-js/extra-typings";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { doUpdateConfiguration } from "./src/handlers/updateConfiguration";
+import { Neo4j } from "./src/neo4j";
 const program = new Command();
 
 program
@@ -11,31 +12,38 @@ program
 
 program
   .command("initialize")
-  .description("changeme")
-  .action(() => {
-    console.log({
-      neo4j_url: "",
-      neo4j_user: "",
-      neo4j_pass: "",
+  .description("Initialize a configuration file for the Neo4j connector")
+  .option("--context <fileName>", "context")
+  .action((str) => {
+    const emptyConfig = {
       typedefs: undefined,
-    });
+    };
+    console.log(emptyConfig);
+    if (str.context) {
+      writeFileSync(path.resolve(str.context), JSON.stringify(emptyConfig));
+    }
   });
 
 program
   .command("update")
-  .description("changeme")
-  // .argument("<string>", "string to split")
+  .description(
+    "Update the configuration file for the Neo4j connector by introspecting the DB"
+  )
   .option("--context <fileName>", "context")
-  .action(async (str, options) => {
+  .action(async (str) => {
     if (str.context) {
       console.log("str", str.context, program.args[0]);
       try {
-        const fileContent = readFileSync(path.resolve(str.context), "utf8");
-        const configObject = JSON.parse(fileContent);
-        const x = await doUpdateConfiguration(configObject);
-        console.log(JSON.stringify(x));
+        const prevConfig = JSON.parse(
+          readFileSync(path.resolve(str.context), "utf8")
+        );
+
+        const updatedConfig = await doUpdateConfiguration(prevConfig);
+        writeFileSync(path.resolve(str.context), JSON.stringify(updatedConfig));
       } catch (error) {
-        console.error("Failed to parse configuration:", error);
+        console.error("Failed to update configuration:", error);
+      } finally {
+        await Neo4j.getInstance().cleanDriver();
       }
     }
   });
