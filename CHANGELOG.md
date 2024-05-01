@@ -1,5 +1,11 @@
 # hasura-ndc-neo4j
 
+## 0.0.2
+
+### Patch Changes
+
+- 05b777f: "Updates to deployment process"
+
 ## 0.0.1
 
 ### Patch Changes
