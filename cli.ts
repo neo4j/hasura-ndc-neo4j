@@ -1,8 +1,10 @@
 import { Command } from "@commander-js/extra-typings";
-import { readFileSync, writeFileSync } from "fs";
+import { writeFile } from "fs/promises";
 import path from "path";
-import { doUpdateConfiguration } from "./src/handlers/updateConfiguration";
-import { Neo4j } from "./src/neo4j";
+import {
+  CONFIGURATION_FILE_NAME,
+  syncConfigurationFile,
+} from "./src/connector-config/syncConfigurationFile";
 const program = new Command();
 
 program
@@ -13,14 +15,17 @@ program
 program
   .command("initialize")
   .description("Initialize a configuration file for the Neo4j connector")
-  .option("--context <fileName>", "context")
-  .action((str) => {
+  .option("--context <directoryName>", "context")
+  .action(async (str) => {
     const emptyConfig = {
       typedefs: undefined,
     };
     console.log(emptyConfig);
     if (str.context) {
-      writeFileSync(path.resolve(str.context), JSON.stringify(emptyConfig));
+      await writeFile(
+        path.resolve(str.context, CONFIGURATION_FILE_NAME),
+        JSON.stringify(emptyConfig)
+      );
     }
   });
 
@@ -29,22 +34,11 @@ program
   .description(
     "Update the configuration file for the Neo4j connector by introspecting the DB"
   )
-  .option("--context <fileName>", "context")
+  .option("--context <directoryName>", "context")
   .action(async (str) => {
     if (str.context) {
       console.log("str", str.context, program.args[0]);
-      try {
-        const prevConfig = JSON.parse(
-          readFileSync(path.resolve(str.context), "utf8")
-        );
-
-        const updatedConfig = await doUpdateConfiguration(prevConfig);
-        writeFileSync(path.resolve(str.context), JSON.stringify(updatedConfig));
-      } catch (error) {
-        console.error("Failed to update configuration:", error);
-      } finally {
-        await Neo4j.getInstance().cleanDriver();
-      }
+      await syncConfigurationFile(str.context);
     }
   });
 
