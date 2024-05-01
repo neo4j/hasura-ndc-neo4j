@@ -1,5 +1,11 @@
 # hasura-ndc-neo4j
 
+## 0.0.3
+
+### Patch Changes
+
+- e64202d: Update deployment process
+
 ## 0.0.2
 
 ### Patch Changes
