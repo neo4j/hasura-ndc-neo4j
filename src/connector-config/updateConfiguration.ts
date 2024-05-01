@@ -1,4 +1,4 @@
-import { Configuration, ConfigurationSchema } from "..";
+import { Configuration, ConfigurationSchema } from "../";
 import { BASE_TYPES, assertTypeNameIsRestricted } from "../constants";
 import { inferRelationshipFieldName, toPlural } from "../utilities";
 import { toGenericStruct, toGraphQLTypeDefs } from "@neo4j/introspector";
@@ -8,11 +8,11 @@ import { ObjectField, Type } from "@hasura/ndc-sdk-typescript";
 import { Neo4j } from "../neo4j";
 
 /**
- * This is a fallback of the default mechanism of getting the data through the configuration object.
- * Assuming there will be an UI in Hasura for schema modelling, the configuration object should be used at all times.
- * For testing purposes, this function provides a DB introspection mechanism as a fallback, so that queries can be run against any data in the DB.
+ * Utility to be called at connector set-up to generate the Configuration that will be used while the connector is running.
+ * Will be called to create the configuration file whenever the connector code is updated. (see entrypoint.sh)
+ * Will be called from the CLI for local development to create the configuration file.
  *
- * @param {Configuration} configuration - A possibly empty configuration. If not empty, the same one should be returned.
+ * @param {Configuration} configuration - Previous configuration
  * @returns {Promise<Configuration>} - An updated configuration to reflect the data present in the DB
  */
 export async function doUpdateConfiguration(
@@ -20,7 +20,6 @@ export async function doUpdateConfiguration(
 ): Promise<Configuration> {
   const driver = Neo4j.getInstance().getDriver();
   const typeDefs = await toGraphQLTypeDefs(() => driver.session());
-  console.log("typeDefs", typeDefs);
   configuration.typeDefs = typeDefs;
 
   // TODO: result of toGenericStruct may differ from what toGraphQLTypeDefs used to generate the typedefs string
@@ -85,9 +84,7 @@ function genericStructToHasuraConfig(
   for (const k in nodesMap) {
     const node = nodesMap[k];
     const nodeMainLabel = node.mainLabel;
-    console.log("label", nodeMainLabel);
     const fields = propertiesToHasuraField(node.properties);
-    console.log("fields", fields);
     config.object_types[nodeMainLabel] = {
       description: null,
       fields: Object.fromEntries(fields.entries()),

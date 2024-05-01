@@ -24,6 +24,8 @@ import { GraphQLSchema } from "graphql";
 import { readFileSync } from "fs";
 import { Neo4jGraphQL } from "@neo4j/graphql";
 import { Neo4j } from "./neo4j";
+import path from "path";
+import { CONFIGURATION_FILE_NAME } from "./connector-config/syncConfigurationFile";
 
 export interface ConfigurationSchema {
   collection_names: string[];
@@ -102,7 +104,10 @@ const connector: Connector<Configuration, State> = {
    */
   async parseConfiguration(configurationDir: string): Promise<Configuration> {
     try {
-      const configLocation = `${configurationDir}configuration.json`;
+      const configLocation = path.join(
+        configurationDir,
+        CONFIGURATION_FILE_NAME
+      );
       const fileContent = readFileSync(configLocation, "utf8");
       const configObject: Configuration = JSON.parse(fileContent);
       return Promise.resolve(configObject);
@@ -256,17 +261,15 @@ const connector: Connector<Configuration, State> = {
 
 start(connector);
 
-function emitExit(signal: string) {
+async function emitExit(signal: string) {
   const exitCode = 0;
   console.log(`Received "${signal}" signal.`);
   console.log(`Clean up driver.`);
-  Neo4j.getInstance()
-    .cleanDriver()
-    .then(() => {
-      console.log(`Terminating...`);
-      process.exit(exitCode);
-    });
+  await Neo4j.getInstance().cleanDriver();
+  console.log(`Terminating...`);
+  process.exit(exitCode);
 }
-process.on("SIGINT", () => emitExit("SIGINT"));
-process.on("SIGUSR1", () => emitExit("SIGUSR1"));
-process.on("SIGUSR2", () => emitExit("SIGUSR2"));
+process.on("SIGTERM", async () => await emitExit("SIGTERM"));
+process.on("SIGINT", async () => await emitExit("SIGINT"));
+process.on("SIGUSR1", async () => await emitExit("SIGUSR1"));
+process.on("SIGUSR2", async () => await emitExit("SIGUSR2"));

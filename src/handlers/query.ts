@@ -24,7 +24,6 @@ export async function doQuery({
   config: ConfigurationSchema;
   variables?: Record<string, unknown>;
 }): Promise<RowSet> {
-  console.log("got query", JSON.stringify(query, null, 2));
   const queryPlan = await planQuery(query, config, variables);
   const neo4jResults = await performQuery({
     queryPlan,
@@ -32,7 +31,6 @@ export async function doQuery({
     variables,
   });
   const resultingRows = transformResult(query, neo4jResults || {});
-  console.log("resulting rows", resultingRows);
   return resultingRows;
   // return {
   //   rows: [{ name: "Keanu", __hasura_phantom_field__car: { rows: [] } }],
