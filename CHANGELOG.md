@@ -1,5 +1,11 @@
 # hasura-ndc-neo4j
 
+## 0.0.5
+
+### Patch Changes
+
+- 0138c72: Updates to deployment process
+
 ## 0.0.4
 
 ### Patch Changes
