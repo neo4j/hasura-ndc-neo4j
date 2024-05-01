@@ -1,6 +1,6 @@
 {
   "name": "hasura-ndc-neo4j",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "private": true,
   "license": "Apache-2.0",
   "main": "index.js",
@@ -11,7 +11,7 @@
     "start:test": "ts-node ./src/index.ts serve --configuration=__tests__/data/ --port=8080",
     "test": "jest --detectOpenHandles",
     "changeset-version": "changeset version --since main && npm install",
-    "release": "npm build && changeset publish"
+    "release": "npm run build && changeset publish"
   },
   "dependencies": {
     "@hasura/ndc-sdk-typescript": "^4.4.0",
