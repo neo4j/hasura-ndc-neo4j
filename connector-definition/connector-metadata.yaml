@@ -1,6 +1,6 @@
 packagingDefinition:
   type: PrebuiltDockerImage
-  dockerImage: ghcr.io/neo4j/ndc-connector-image:v0.0.1
+  dockerImage: ghcr.io/neo4j/hasura-ndc-neo4j:v0.0.6
 supportedEnvironmentVariables:
   - name: NEO4J_URL
     description: The url for the Neo4j Database
@@ -9,7 +9,11 @@ supportedEnvironmentVariables:
   - name: NEO4J_PASS
     description: The password for the Neo4j Database
 commands:
-  update: docker run --rm -e NEO4J_URL="$NEO4J_URL" -e NEO4J_USER="$NEO4J_USER" -e NEO4J_PASS="$NEO4J_PASS" -v "$HASURA_CONFIGURATION_DIRECTORY":/etc/connector ghcr.io/neo4j/ndc-connector-image:v0.0.1 update
+  update:
+    type: Dockerized
+    dockerImage: ghcr.io/neo4j/hasura-ndc-neo4j:v0.0.6
+    commandArgs:
+      - update
 dockerComposeWatch:
   - path: ./
     target: /etc/connector

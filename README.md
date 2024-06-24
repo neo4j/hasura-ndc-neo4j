@@ -2,18 +2,17 @@
 
 ### To start the server:
 
-1. Make sure there is a `configuration.json` file at the root level. The file should look like this:
+All commands will require some environment variables to connect to your Neo4j instance, for example:
+NEO4J_URL=neo4j://localhost:7687/neo4j
+NEO4J_USER=<user>
+NEO4J_PASS=<password>
 
-```json
-{
-  "neo4j_url": "neo4j://localhost:7687/neo4j",
-  "neo4j_user": "",
-  "neo4j_pass": ""
-}
-```
+Remember to provide them when running the following commands.
 
-The config property is optional and if not configured, the server will introspect the Neo4j DB in order to create the GraphQL operations.
-To control the design of the GraphQL operations, the `config` property can be specified. An example can be found in the `__tests__/data/configuration.json` file.
+#### Prerequisite: Set-up configuration file
+
+Use the included CLI tool by running `npm run update:config`.
+This will introspect your database and create the corresponding configuration file in the root directory, named `configuration.json`. The connector will use this file in running mode.
 
 2. Run `npm install`
 
