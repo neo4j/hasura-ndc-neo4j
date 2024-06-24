@@ -1,5 +1,11 @@
 # hasura-ndc-neo4j
 
+## 0.0.6
+
+### Patch Changes
+
+- 5c05889: Updates to connector packaging
+
 ## 0.0.5
 
 ### Patch Changes
