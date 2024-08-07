@@ -5,7 +5,7 @@ import {
 } from "@hasura/ndc-sdk-typescript";
 
 export const CAPABILITIES_RESPONSE: CapabilitiesResponse = {
-  version: "^0.1.0",
+  version: "0.1.2",
   capabilities: {
     query: {
       aggregates: null,
