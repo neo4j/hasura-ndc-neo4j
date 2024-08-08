@@ -1,5 +1,11 @@
 # hasura-ndc-neo4j
 
+## 0.0.7
+
+### Patch Changes
+
+- c80f7c5: Update capabilities response
+
 ## 0.0.6
 
 ### Patch Changes
