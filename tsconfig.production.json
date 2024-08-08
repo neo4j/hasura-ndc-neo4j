@@ -1,5 +1,5 @@
 {
   "extends": "./tsconfig.json", 
-  "include": ["src/**/*", "connector-definition/**/*"], 
+  "include": ["src/**/*", "connector-definition/**/*", "generate-config.ts"], 
 }
   
