@@ -1,6 +1,6 @@
 packagingDefinition:
   type: PrebuiltDockerImage
-  dockerImage: ghcr.io/neo4j/hasura-ndc-neo4j:v0.0.8
+  dockerImage: ghcr.io/neo4j/hasura-ndc-neo4j:v0.0.10
 supportedEnvironmentVariables:
   - name: NEO4J_URL
     description: The url for the Neo4j Database
@@ -11,7 +11,7 @@ supportedEnvironmentVariables:
 commands:
   update:
     type: Dockerized
-    dockerImage: ghcr.io/neo4j/hasura-ndc-neo4j:v0.0.8
+    dockerImage: ghcr.io/neo4j/hasura-ndc-neo4j:v0.0.10
     commandArgs:
       - update
 dockerComposeWatch:
