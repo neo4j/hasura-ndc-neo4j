@@ -1,5 +1,11 @@
 # hasura-ndc-neo4j
 
+## 0.0.10
+
+### Patch Changes
+
+- 8e9f5b0: Release v 0.0.10
+
 ## 0.0.9
 
 ### Patch Changes
