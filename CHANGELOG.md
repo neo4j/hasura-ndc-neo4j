@@ -1,5 +1,11 @@
 # hasura-ndc-neo4j
 
+## 0.0.9
+
+### Patch Changes
+
+- 8c30a5d: Release connector v0.0.8
+
 ## 0.0.7
 
 ### Patch Changes
