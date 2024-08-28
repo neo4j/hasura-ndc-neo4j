@@ -1,71 +1,102 @@
-# hasura-ndc-neo4j
+# Hasura Neo4j Connector
+<a href="https://neo4j.com/"><img src="https://github.com/neo4j/hasura-ndc-neo4j/blob/main/docs/logo.png" align="right" width="200"></a>
 
-### To start the server:
+The Hasura Neo4j Connector allows for connecting to a Neo4j database to give you an instant GraphQL API on top of your Neo4j data.
 
-All commands will require some environment variables to connect to your Neo4j instance, for example:
-NEO4J_URL=neo4j://localhost:7687/neo4j
-NEO4J_USER=<user>
-NEO4J_PASS=<password>
+This connector is built using the [Typescript Data Connector SDK](https://github.com/hasura/ndc-sdk-typescript) and implements the [Data Connector Spec](https://github.com/hasura/ndc-spec).
 
-Remember to provide them when running the following commands.
+- [See the listing in the Hasura Hub](https://hasura.io/connectors/neo4j)
+- [Hasura V3 Documentation](https://hasura.io/docs/3.0/index/)
 
-#### Prerequisite: Set-up configuration file
+## Features
 
-Use the included CLI tool by running `npm run update:config`.
-This will introspect your database and create the corresponding configuration file in the root directory, named `configuration.json`. The connector will use this file in running mode.
+Below, you'll find a matrix of all supported features for the Turso connector:
 
-2. Run `npm install`
+| Feature                         | Supported | Notes |
+| ------------------------------- | --------- | ----- |
+| Native Queries + Logical Models | ❌     |       |
+| Simple Object Query             | ✅     |       |
+| Filter / Search                 | ✅     |       |
+| Simple Aggregation              | ❌     |       |
+| Sort                            | ✅     |       |
+| Paginate                        | ✅     |       |
+| Table Relationships             | ✅     |       |
+| Views                           | ❌     |       |
+| Distinct                        | ❌     |       |
+| Remote Relationships            | ✅     |       |
+| Custom Fields                   | ❌     |       |
+| Mutations                       | ❌     |       |
 
-3. Run `npm start`
+## Before you get Started
 
-### To run the Hasura tests:
+1. The [DDN CLI](https://hasura.io/docs/3.0/cli/installation) and [Docker](https://docs.docker.com/engine/install/) installed
+2. A [supergraph](https://hasura.io/docs/3.0/getting-started/init-supergraph)
+3. A [subgraph](https://hasura.io/docs/3.0/getting-started/init-subgraph)
+4. Have a [Neo4j](https://neo4j.com/product/neo4j-graph-database/) database, along with login credentials.
 
-1. Make sure the server is started by following the instructions above.
+The steps below explain how to Initialize and configure a connector for local development. You can learn how to deploy a
+connector — after it's been configured — [here](https://hasura.io/docs/3.0/getting-started/deployment/deploy-a-connector).
 
-2. Run `cargo run --bin ndc-test -- test --endpoint http://localhost:8100` from the `ndc-spec`. More info can be found [here](https://github.com/hasura/ndc-spec/tree/main#test-an-agent).
+## Using the Neo4j connector
 
-### To test the features of the connector by sending different requests and asserting the responses:
+### Step 1: Authenticate your CLI session
 
-1. Make sure the server is started in test mode. For this, follow the instructions above but run the `npm run start:test` command as the last step.
-
-2. Run `npm run test`
-
-3. Any new tests you want to run should be inside the `__tests__/requests` folder and should follow the schema described in the `__tests__/data/configuration.json` file
-
-## Development
-
-Prerequisite: Steps 1-3 from https://hasura.io/docs/3.0/local-dev/#step-1-prerequisites
-
-1. Start server locally
-
-2. Make sure the connector URL is your local server URL
-
-```yml
-definition:
-  name: neo4j_connector
-  url:
-    singleUrl:
-      value: http://localhost:<PORT>
+```bash
+ddn auth login
 ```
 
-## Deploy connector
+### Step 2: Configure the connector
 
-1. Start server locally
+Once you have an initialized supergraph and subgraph, run the initialization command in interactive mode while providing a name for the connector in the prompt:
 
-2. Use Hasura extension to refresh connector, track collections, track relationships
+```bash
+ddn connector init neo4j -i
+```
 
-- only track Array relationships
-- rename relationships if necessary
+#### Step 2.1: Choose the `neo4j/neo4j` option from the list
 
-3. Start Hasura daemon: `hasura3 daemon start`
+#### Step 2.2: Choose a port for the connector
 
-4. Get Tunnel Endpoint
+The CLI will ask for a specific port to run the connector on. Choose a port that is not already in use or use the default suggested port.
 
-- check if exists: `hasura3 tunnel list`
-- or create one: `hasura3 tunnel create localhost:<PORT>`
+#### Step 2.3: Provide the env var(s) for the connector
 
-5. Change connector URL to Tunnel Endpoint
+| Name | Description |
+|-|-|
+| NEO4J_URL        | The connection string for the Neo4j database |
+| NEO4J_USER | The username for the Neo4J database |
+| NEO4J_PASS | The password for the Neo4J database |
 
-6. Deploy connector: `hasura3 build create`
+You'll find the environment variables in the `.env` file and they will be in the format:
 
-7. Run queries in Hasura Console using the latest build: https://console.hasura.io/project/grown-pegasus-6631
+`<SUBGRAPH_NAME>_<CONNECTOR_NAME>_<VARIABLE_NAME>`
+
+Here is an example of what your `.env` file might look like:
+
+```
+APP_NEO4J_AUTHORIZATION_HEADER="Bearer vrHKneV3KIs-qz5dbIbFsg=="
+APP_NEO4J_HASURA_SERVICE_TOKEN_SECRET="vrHKneV3KIs-qz5dbIbFsg=="
+APP_NEO4J_NEO4J_PASS="2j..."
+APP_NEO4J_NEO4J_URL="neo4j+s://47b154c4.databases.neo4j.io"
+APP_NEO4J_NEO4J_USER="neo4j"
+APP_NEO4J_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://local.hasura.dev:4317"
+APP_NEO4J_OTEL_SERVICE_NAME="app_neo4j"
+APP_NEO4J_READ_URL="http://local.hasura.dev:8781"
+APP_NEO4J_WRITE_URL="http://local.hasura.dev:8781"
+```
+
+### Step 3: Introspect the connector
+
+Introspecting the connector will generate a `configuration.json` file and a `neo4j.hml` file.
+
+```bash
+ddn connector introspect neo4j
+```
+
+### Step 4: Add your resources
+
+You can add the models, commands, and relationships to your API by tracking them which generates the HML files. 
+
+```bash
+ddn connector-link add-resources neo4j
+```
