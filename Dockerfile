@@ -1,5 +1,5 @@
-# Use Node.js 20 as the base image for both build and production stages
-FROM node:20 AS build-stage
+# Use Node.js 24 as the base image for both build and production stages
+FROM node:24 AS build-stage
 
 # Set the working directory inside the container for the build stage
 WORKDIR /usr/src/app
@@ -20,7 +20,7 @@ COPY . .
 RUN tsc
 
 # Start a new stage for the production environment
-FROM node:20 AS production
+FROM node:24 AS production
 
 # Set working directory for the production stage
 WORKDIR /usr/src/app
