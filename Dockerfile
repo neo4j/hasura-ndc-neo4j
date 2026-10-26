@@ -10,14 +10,11 @@ COPY package*.json ./
 # Install both production and development dependencies
 RUN npm install
 
-# Install TypeScript globally
-RUN npm install -g typescript
-
 # Copy the entire project
 COPY . .
 
-# Compile TypeScript to JavaScript
-RUN tsc
+# Compile with the TypeScript version pinned in package-lock.json
+RUN npx tsc
 
 # Start a new stage for the production environment
 FROM node:24 AS production

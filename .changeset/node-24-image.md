@@ -2,4 +2,4 @@
 "hasura-ndc-neo4j": patch
 ---
 
-Run the connector image on Node.js 24. Node.js 20 is end of life.
+Run the connector image on Node.js 24. Node.js 20 is end of life. The image now compiles with the TypeScript version in `package-lock.json`.
